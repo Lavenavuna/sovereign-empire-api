@@ -1,24 +1,30 @@
 """
-Production API for Sovereign Empire Content Automation
-Wraps your working create_content.py script
+Sovereign Empire Content API - Production Version with Queue
 """
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional
-import subprocess
 import os
+import json
 from datetime import datetime
-import shutil
+from inngest import Inngest
+from inngest.fast_api import serve
+from openai import OpenAI
+from dotenv import load_dotenv
 
+# Load environment variables
+load_dotenv()
+
+# Initialize FastAPI
 app = FastAPI(
     title="Sovereign Empire Content API",
-    description="AI-powered content generation system",
-    version="1.0.0"
+    description="AI-powered content generation with queue system",
+    version="2.0.0"
 )
 
-# CORS - allows front-end to call this API
+# CORS middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -27,137 +33,273 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Request model
+# Initialize Inngest client
+inngest_client = Inngest(
+    app_id="sovereign-empire",
+    event_key=os.environ.get("INNGEST_EVENT_KEY", "local-dev-key"),
+    signing_key=os.environ.get("INNGEST_SIGNING_KEY")
+)
+
+# Initialize OpenAI
+openai_client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+
+# In-memory job storage (will be replaced with database in Fix #7)
+jobs_db = {}
+
+
+# Request/Response Models
 class ContentRequest(BaseModel):
     topic: str
-    tenant_id: str
+    tenant_id: str = "default"
 
-# Response model
-class ContentResponse(BaseModel):
+
+class JobResponse(BaseModel):
     success: bool
     job_id: str
     message: str
+    status: str = "queued"
+
+
+class JobStatus(BaseModel):
+    job_id: str
+    status: str
+    topic: str
+    tenant_id: str
+    created_at: str
+    completed_at: Optional[str] = None
     blog_post: Optional[str] = None
     linkedin_post: Optional[str] = None
     twitter_thread: Optional[str] = None
+    error: Optional[str] = None
 
+
+# Content Generation Functions (from create_content.py)
+def generate_blog_post(topic: str) -> str:
+    """Generate blog post using OpenAI"""
+    prompt = f"""Write a comprehensive, engaging blog post about: {topic}
+
+REQUIREMENTS:
+- 1000-1200 words
+- Start with a POWERFUL hook that makes readers want to keep reading
+- Use storytelling and real-world examples
+- Include 5-7 actionable takeaways
+- SEO-optimized with natural keyword usage
+- Write in a conversational, engaging tone
+- End with a strong call-to-action
+- Use short paragraphs (2-3 sentences max)
+- Include subheadings (## format)
+
+Make it so good that readers can't stop reading and want to share it immediately."""
+
+    response = openai_client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": "You are an expert content writer who creates viral, SEO-optimized content."},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.7,
+        max_tokens=2000
+    )
+    return response.choices[0].message.content
+
+
+def generate_linkedin_post(blog_content: str, topic: str) -> str:
+    """Generate LinkedIn post"""
+    prompt = f"""Based on this blog post about '{topic}', create a LinkedIn post.
+
+REQUIREMENTS:
+- 150-200 words
+- Start with a hook that stops the scroll
+- Include 3 key insights from the blog
+- Professional but conversational tone
+- End with a thought-provoking question
+- Use line breaks for readability
+- NO hashtags
+
+Blog excerpt: {blog_content[:500]}"""
+
+    response = openai_client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": "You are a LinkedIn content expert."},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.7,
+        max_tokens=300
+    )
+    return response.choices[0].message.content
+
+
+def generate_twitter_thread(blog_content: str, topic: str) -> str:
+    """Generate Twitter thread"""
+    prompt = f"""Based on this blog post about '{topic}', create a Twitter thread.
+
+REQUIREMENTS:
+- 5-7 tweets (numbered 1/, 2/, etc.)
+- First tweet: Attention-grabbing hook
+- Middle tweets: Key insights (one per tweet)
+- Last tweet: Call-to-action + "Follow for more"
+- Each tweet under 280 characters
+- Use simple, punchy language
+- Max 1-2 hashtags in last tweet only
+
+Blog excerpt: {blog_content[:500]}"""
+
+    response = openai_client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": "You are a viral Twitter content creator."},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.7,
+        max_tokens=500
+    )
+    return response.choices[0].message.content
+
+
+# Inngest Function - The Worker
+@inngest_client.create_function(
+    fn_id="generate-content",
+    trigger=inngest_client.event("content/generate"),
+    retries=2
+)
+async def generate_content_worker(ctx, step):
+    """Background worker that generates content"""
+    
+    # Get event data
+    job_id = ctx.event.data["job_id"]
+    topic = ctx.event.data["topic"]
+    tenant_id = ctx.event.data["tenant_id"]
+    
+    try:
+        # Update status to processing
+        jobs_db[job_id]["status"] = "processing"
+        
+        # Step 1: Generate blog post
+        blog_post = await step.run("generate-blog", lambda: generate_blog_post(topic))
+        
+        # Step 2: Generate LinkedIn post
+        linkedin_post = await step.run(
+            "generate-linkedin",
+            lambda: generate_linkedin_post(blog_post, topic)
+        )
+        
+        # Step 3: Generate Twitter thread
+        twitter_thread = await step.run(
+            "generate-twitter",
+            lambda: generate_twitter_thread(blog_post, topic)
+        )
+        
+        # Update job with results
+        jobs_db[job_id].update({
+            "status": "completed",
+            "completed_at": datetime.utcnow().isoformat(),
+            "blog_post": blog_post,
+            "linkedin_post": linkedin_post,
+            "twitter_thread": twitter_thread
+        })
+        
+        return {"success": True, "job_id": job_id}
+        
+    except Exception as e:
+        # Update job with error
+        jobs_db[job_id].update({
+            "status": "failed",
+            "error": str(e),
+            "completed_at": datetime.utcnow().isoformat()
+        })
+        raise
+
+
+# API Endpoints
 @app.get("/")
-def root():
+async def root():
+    """Health check"""
     return {
         "service": "Sovereign Empire Content API",
-        "version": "1.0.0",
-        "status": "online"
+        "version": "2.0.0",
+        "status": "online",
+        "queue": "inngest"
     }
+
 
 @app.get("/health")
-def health_check():
-    return {
-        "status": "healthy",
-        "timestamp": datetime.utcnow().isoformat(),
-        "system": "operational"
-    }
+async def health():
+    """Health check endpoint"""
+    return {"status": "healthy", "queue": "inngest"}
 
-@app.post("/generate", response_model=ContentResponse)
+
+@app.post("/generate", response_model=JobResponse)
 async def generate_content(request: ContentRequest):
     """
-    Generate content using your working create_content.py script
+    Queue content generation job
+    Returns immediately with job_id
     """
-    try:
-        job_id = f"{request.tenant_id}_{int(datetime.now().timestamp())}"
-        
-        print(f"🚀 Generating content for: {request.topic}")
-        print(f"👤 Tenant: {request.tenant_id}")
-        
-        # Run your actual working script
-        result = subprocess.run(
-            ["python", "create_content.py", request.topic],
-            capture_output=True,
-            text=True,
-            timeout=300,  # 5 minutes
-            encoding='utf-8',
-            errors='ignore'
-        )
-        
-        if result.returncode != 0:
-            print(f"❌ Script failed: {result.stderr}")
-            raise Exception(f"Generation failed: {result.stderr}")
-        
-        print(f"✅ Script completed successfully")
-        
-        # Read the generated files
-        content_folder = "my_first_content"
-        
-        # Read blog post
-        blog_post = None
-        blog_path = os.path.join(content_folder, "blog_post.md")
-        if os.path.exists(blog_path):
-            with open(blog_path, 'r', encoding='utf-8') as f:
-                blog_post = f.read()
-            print(f"📝 Blog post: {len(blog_post)} characters")
-        
-        # Read LinkedIn post
-        linkedin_post = None
-        linkedin_path = os.path.join(content_folder, "linkedin_post")
-        if os.path.exists(linkedin_path):
-            with open(linkedin_path, 'r', encoding='utf-8') as f:
-                linkedin_post = f.read()
-            print(f"💼 LinkedIn post: {len(linkedin_post)} characters")
-        
-        # Read Twitter thread
-        twitter_thread = None
-        twitter_path = os.path.join(content_folder, "twitter_thread")
-        if os.path.exists(twitter_path):
-            with open(twitter_path, 'r', encoding='utf-8') as f:
-                twitter_thread = f.read()
-            print(f"🐦 Twitter thread: {len(twitter_thread)} characters")
-        
-        # Archive this content (save with tenant_id and timestamp)
-        archive_folder = f"content_archive/{request.tenant_id}/{job_id}"
-        os.makedirs(archive_folder, exist_ok=True)
-        
-        # Copy files to archive
-        if os.path.exists(blog_path):
-            shutil.copy(blog_path, archive_folder)
-        if os.path.exists(linkedin_path):
-            shutil.copy(linkedin_path, archive_folder)
-        if os.path.exists(twitter_path):
-            shutil.copy(twitter_path, archive_folder)
-        
-        print(f"📦 Archived to: {archive_folder}")
-        
-        return ContentResponse(
-            success=True,
-            job_id=job_id,
-            message=f"Content generated successfully for: {request.topic}",
-            blog_post=blog_post,
-            linkedin_post=linkedin_post,
-            twitter_thread=twitter_thread
-        )
-        
-    except subprocess.TimeoutExpired:
-        print(f"⏱️ Timeout after 5 minutes")
-        raise HTTPException(status_code=408, detail="Generation timed out after 5 minutes")
-    except Exception as e:
-        print(f"❌ Error: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
+    
+    # Generate job ID
+    job_id = f"{request.tenant_id}_{int(datetime.utcnow().timestamp())}"
+    
+    # Create job record
+    jobs_db[job_id] = {
+        "job_id": job_id,
+        "status": "queued",
+        "topic": request.topic,
+        "tenant_id": request.tenant_id,
+        "created_at": datetime.utcnow().isoformat(),
+        "completed_at": None,
+        "blog_post": None,
+        "linkedin_post": None,
+        "twitter_thread": None,
+        "error": None
+    }
+    
+    # Send event to Inngest (triggers background worker)
+    await inngest_client.send({
+        "name": "content/generate",
+        "data": {
+            "job_id": job_id,
+            "topic": request.topic,
+            "tenant_id": request.tenant_id
+        }
+    })
+    
+    return JobResponse(
+        success=True,
+        job_id=job_id,
+        message=f"Content generation queued for: {request.topic}",
+        status="queued"
+    )
 
-@app.post("/test")
-async def test_api(request: ContentRequest):
+
+@app.get("/status/{job_id}", response_model=JobStatus)
+async def get_job_status(job_id: str):
     """
-    Test endpoint - doesn't actually generate content
-    Use this to verify API is working without using AI credits
+    Check job status and get results
+    """
+    if job_id not in jobs_db:
+        raise HTTPException(status_code=404, detail="Job not found")
+    
+    return JobStatus(**jobs_db[job_id])
+
+
+@app.get("/jobs")
+async def list_jobs():
+    """
+    List all jobs (for admin/debugging)
     """
     return {
-        "success": True,
-        "message": f"API is working. Would generate content for: {request.topic}",
-        "tenant_id": request.tenant_id,
-        "note": "This is a test - no actual content generated"
+        "total": len(jobs_db),
+        "jobs": list(jobs_db.values())
     }
+
+
+# Mount Inngest serve endpoint
+app.mount("/api/inngest", serve(
+    client=inngest_client,
+    functions=[generate_content_worker]
+))
+
 
 if __name__ == "__main__":
     import uvicorn
-    print("🚀 Starting Sovereign Empire API...")
-    print("📍 API running at: http://localhost:8000")
-    print("📚 API docs at: http://localhost:8000/docs")
-    print("✨ Ready to generate content!")
     uvicorn.run(app, host="0.0.0.0", port=8000)
