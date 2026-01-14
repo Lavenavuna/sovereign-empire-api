@@ -1,18 +1,17 @@
 """
-Sovereign Empire Content API - Production Version with Queue
+Sovereign Empire Content API - Simplified Queue Version
+Uses FastAPI BackgroundTasks for reliable async processing
 """
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, Dict
 import os
-import json
 from datetime import datetime
-from inngest import Inngest
-from inngest.fast_api import serve
 from openai import OpenAI
 from dotenv import load_dotenv
+import asyncio
 
 # Load environment variables
 load_dotenv()
@@ -21,7 +20,7 @@ load_dotenv()
 app = FastAPI(
     title="Sovereign Empire Content API",
     description="AI-powered content generation with queue system",
-    version="2.0.0"
+    version="2.1.0"
 )
 
 # CORS middleware
@@ -33,18 +32,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Initialize Inngest client
-inngest_client = Inngest(
-    app_id="sovereign-empire",
-    event_key=os.environ.get("INNGEST_EVENT_KEY", "local-dev-key"),
-    signing_key=os.environ.get("INNGEST_SIGNING_KEY")
-)
-
 # Initialize OpenAI
-openai_client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+api_key = os.environ.get("OPENAI_API_KEY")
+if not api_key:
+    raise ValueError("OPENAI_API_KEY environment variable not set")
 
-# In-memory job storage (will be replaced with database in Fix #7)
-jobs_db = {}
+openai_client = OpenAI(api_key=api_key)
+
+# In-memory job storage
+jobs_db: Dict = {}
 
 
 # Request/Response Models
@@ -73,7 +69,7 @@ class JobStatus(BaseModel):
     error: Optional[str] = None
 
 
-# Content Generation Functions (from create_content.py)
+# Content Generation Functions
 def generate_blog_post(topic: str) -> str:
     """Generate blog post using OpenAI"""
     prompt = f"""Write a comprehensive, engaging blog post about: {topic}
@@ -157,38 +153,22 @@ Blog excerpt: {blog_content[:500]}"""
     return response.choices[0].message.content
 
 
-# Inngest Function - The Worker
-@inngest_client.create_function(
-    fn_id="generate-content",
-    trigger="content/generate",
-    retries=2
-)
-async def generate_content_worker(ctx, step):
+# Background Worker Function
+async def process_content_generation(job_id: str, topic: str, tenant_id: str):
     """Background worker that generates content"""
-    
-    # Get event data
-    job_id = ctx.event.data["job_id"]
-    topic = ctx.event.data["topic"]
-    tenant_id = ctx.event.data["tenant_id"]
     
     try:
         # Update status to processing
         jobs_db[job_id]["status"] = "processing"
         
-        # Step 1: Generate blog post
-        blog_post = await step.run("generate-blog", lambda: generate_blog_post(topic))
+        # Generate blog post
+        blog_post = generate_blog_post(topic)
         
-        # Step 2: Generate LinkedIn post
-        linkedin_post = await step.run(
-            "generate-linkedin",
-            lambda: generate_linkedin_post(blog_post, topic)
-        )
+        # Generate LinkedIn post
+        linkedin_post = generate_linkedin_post(blog_post, topic)
         
-        # Step 3: Generate Twitter thread
-        twitter_thread = await step.run(
-            "generate-twitter",
-            lambda: generate_twitter_thread(blog_post, topic)
-        )
+        # Generate Twitter thread
+        twitter_thread = generate_twitter_thread(blog_post, topic)
         
         # Update job with results
         jobs_db[job_id].update({
@@ -199,8 +179,6 @@ async def generate_content_worker(ctx, step):
             "twitter_thread": twitter_thread
         })
         
-        return {"success": True, "job_id": job_id}
-        
     except Exception as e:
         # Update job with error
         jobs_db[job_id].update({
@@ -208,7 +186,6 @@ async def generate_content_worker(ctx, step):
             "error": str(e),
             "completed_at": datetime.utcnow().isoformat()
         })
-        raise
 
 
 # API Endpoints
@@ -217,20 +194,20 @@ async def root():
     """Health check"""
     return {
         "service": "Sovereign Empire Content API",
-        "version": "2.0.0",
+        "version": "2.1.0",
         "status": "online",
-        "queue": "inngest"
+        "queue": "fastapi-background-tasks"
     }
 
 
 @app.get("/health")
 async def health():
     """Health check endpoint"""
-    return {"status": "healthy", "queue": "inngest"}
+    return {"status": "healthy", "queue": "fastapi-background-tasks"}
 
 
 @app.post("/generate", response_model=JobResponse)
-async def generate_content(request: ContentRequest):
+async def generate_content(request: ContentRequest, background_tasks: BackgroundTasks):
     """
     Queue content generation job
     Returns immediately with job_id
@@ -253,15 +230,13 @@ async def generate_content(request: ContentRequest):
         "error": None
     }
     
-    # Send event to Inngest (triggers background worker)
-    await inngest_client.send({
-        "name": "content/generate",
-        "data": {
-            "job_id": job_id,
-            "topic": request.topic,
-            "tenant_id": request.tenant_id
-        }
-    })
+    # Add background task
+    background_tasks.add_task(
+        process_content_generation,
+        job_id,
+        request.topic,
+        request.tenant_id
+    )
     
     return JobResponse(
         success=True,
@@ -291,13 +266,6 @@ async def list_jobs():
         "total": len(jobs_db),
         "jobs": list(jobs_db.values())
     }
-
-
-# Mount Inngest serve endpoint
-app.mount("/api/inngest", serve(
-    client=inngest_client,
-    functions=[generate_content_worker]
-))
 
 
 if __name__ == "__main__":
