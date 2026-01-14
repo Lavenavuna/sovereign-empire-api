@@ -1,6 +1,6 @@
 """
-Sovereign Empire Content API - Simplified Queue Version
-Uses FastAPI BackgroundTasks for reliable async processing
+Sovereign Empire Content API - BULLETPROOF VERSION
+Uses direct HTTP calls to OpenAI - works everywhere, no proxy issues
 """
 
 from fastapi import FastAPI, HTTPException, BackgroundTasks
@@ -9,23 +9,18 @@ from pydantic import BaseModel
 from typing import Optional, Dict
 import os
 from datetime import datetime
-from openai import OpenAI
+import json
+import httpx
 from dotenv import load_dotenv
-import asyncio
 
 # Load environment variables
 load_dotenv()
 
-# Clear any proxy settings that might interfere with OpenAI
-for proxy_var in ['HTTP_PROXY', 'HTTPS_PROXY', 'http_proxy', 'https_proxy']:
-    if proxy_var in os.environ:
-        del os.environ[proxy_var]
-
 # Initialize FastAPI
 app = FastAPI(
     title="Sovereign Empire Content API",
-    description="AI-powered content generation with queue system",
-    version="2.1.0"
+    description="AI-powered content generation - Bulletproof Edition",
+    version="3.0.0"
 )
 
 # CORS middleware
@@ -37,17 +32,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Initialize OpenAI
-api_key = os.environ.get("OPENAI_API_KEY")
-if not api_key:
+# Get API key
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+if not OPENAI_API_KEY:
     raise ValueError("OPENAI_API_KEY environment variable not set")
-
-# Initialize with explicit configuration to avoid Railway proxy issues
-openai_client = OpenAI(
-    api_key=api_key,
-    timeout=120.0,
-    max_retries=2
-)
 
 # In-memory job storage
 jobs_db: Dict = {}
@@ -79,96 +67,105 @@ class JobStatus(BaseModel):
     error: Optional[str] = None
 
 
+# Direct OpenAI API calls (no SDK)
+def call_openai(system_prompt: str, user_prompt: str, max_tokens: int = 2000) -> str:
+    """
+    Direct HTTP call to OpenAI API
+    No SDK = no proxy issues, works everywhere
+    """
+    url = "https://api.openai.com/v1/chat/completions"
+    
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {OPENAI_API_KEY}"
+    }
+    
+    data = {
+        "model": "gpt-4o",
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt}
+        ],
+        "temperature": 0.7,
+        "max_tokens": max_tokens
+    }
+    
+    # Use httpx with no proxy (force direct connection)
+    with httpx.Client(timeout=120.0, proxies={}) as client:
+        response = client.post(url, headers=headers, json=data)
+        response.raise_for_status()
+        result = response.json()
+        return result["choices"][0]["message"]["content"]
+
+
 # Content Generation Functions
 def generate_blog_post(topic: str) -> str:
-    """Generate blog post using OpenAI"""
+    """Generate blog post"""
+    system = "You are an expert content writer who creates viral, SEO-optimized content."
+    
     prompt = f"""Write a comprehensive, engaging blog post about: {topic}
 
 REQUIREMENTS:
 - 1000-1200 words
-- Start with a POWERFUL hook that makes readers want to keep reading
+- Start with a POWERFUL hook
 - Use storytelling and real-world examples
 - Include 5-7 actionable takeaways
-- SEO-optimized with natural keyword usage
-- Write in a conversational, engaging tone
-- End with a strong call-to-action
-- Use short paragraphs (2-3 sentences max)
+- SEO-optimized
+- Conversational tone
+- Strong call-to-action
+- Short paragraphs (2-3 sentences max)
 - Include subheadings (## format)
 
-Make it so good that readers can't stop reading and want to share it immediately."""
-
-    response = openai_client.chat.completions.create(
-        model="gpt-4o",
-        messages=[
-            {"role": "system", "content": "You are an expert content writer who creates viral, SEO-optimized content."},
-            {"role": "user", "content": prompt}
-        ],
-        temperature=0.7,
-        max_tokens=2000
-    )
-    return response.choices[0].message.content
+Make it so good readers can't stop reading."""
+    
+    return call_openai(system, prompt, max_tokens=2000)
 
 
 def generate_linkedin_post(blog_content: str, topic: str) -> str:
     """Generate LinkedIn post"""
-    prompt = f"""Based on this blog post about '{topic}', create a LinkedIn post.
+    system = "You are a LinkedIn content expert who writes engaging posts."
+    
+    prompt = f"""Based on this blog about '{topic}', create a LinkedIn post.
 
 REQUIREMENTS:
 - 150-200 words
-- Start with a hook that stops the scroll
-- Include 3 key insights from the blog
-- Professional but conversational tone
-- End with a thought-provoking question
-- Use line breaks for readability
+- Scroll-stopping hook
+- 3 key insights
+- Professional but conversational
+- Thought-provoking question
 - NO hashtags
 
 Blog excerpt: {blog_content[:500]}"""
-
-    response = openai_client.chat.completions.create(
-        model="gpt-4o",
-        messages=[
-            {"role": "system", "content": "You are a LinkedIn content expert."},
-            {"role": "user", "content": prompt}
-        ],
-        temperature=0.7,
-        max_tokens=300
-    )
-    return response.choices[0].message.content
+    
+    return call_openai(system, prompt, max_tokens=300)
 
 
 def generate_twitter_thread(blog_content: str, topic: str) -> str:
     """Generate Twitter thread"""
-    prompt = f"""Based on this blog post about '{topic}', create a Twitter thread.
+    system = "You are a viral Twitter content creator."
+    
+    prompt = f"""Based on this blog about '{topic}', create a Twitter thread.
 
 REQUIREMENTS:
 - 5-7 tweets (numbered 1/, 2/, etc.)
-- First tweet: Attention-grabbing hook
-- Middle tweets: Key insights (one per tweet)
-- Last tweet: Call-to-action + "Follow for more"
-- Each tweet under 280 characters
-- Use simple, punchy language
-- Max 1-2 hashtags in last tweet only
+- Attention-grabbing first tweet
+- Key insights (one per tweet)
+- Last tweet: CTA + "Follow for more"
+- Under 280 chars each
+- Punchy language
+- Max 1-2 hashtags in last tweet
 
 Blog excerpt: {blog_content[:500]}"""
-
-    response = openai_client.chat.completions.create(
-        model="gpt-4o",
-        messages=[
-            {"role": "system", "content": "You are a viral Twitter content creator."},
-            {"role": "user", "content": prompt}
-        ],
-        temperature=0.7,
-        max_tokens=500
-    )
-    return response.choices[0].message.content
+    
+    return call_openai(system, prompt, max_tokens=500)
 
 
-# Background Worker Function
+# Background Worker
 async def process_content_generation(job_id: str, topic: str, tenant_id: str):
     """Background worker that generates content"""
     
     try:
-        # Update status to processing
+        # Update status
         jobs_db[job_id]["status"] = "processing"
         
         # Generate blog post
@@ -204,22 +201,22 @@ async def root():
     """Health check"""
     return {
         "service": "Sovereign Empire Content API",
-        "version": "2.1.0",
+        "version": "3.0.0",
         "status": "online",
-        "queue": "fastapi-background-tasks"
+        "method": "direct-http"
     }
 
 
 @app.get("/health")
 async def health():
-    """Health check endpoint"""
-    return {"status": "healthy", "queue": "fastapi-background-tasks"}
+    """Health check"""
+    return {"status": "healthy"}
 
 
 @app.post("/generate", response_model=JobResponse)
 async def generate_content(request: ContentRequest, background_tasks: BackgroundTasks):
     """
-    Queue content generation job
+    Queue content generation
     Returns immediately with job_id
     """
     
@@ -258,9 +255,7 @@ async def generate_content(request: ContentRequest, background_tasks: Background
 
 @app.get("/status/{job_id}", response_model=JobStatus)
 async def get_job_status(job_id: str):
-    """
-    Check job status and get results
-    """
+    """Check job status and get results"""
     if job_id not in jobs_db:
         raise HTTPException(status_code=404, detail="Job not found")
     
@@ -269,9 +264,7 @@ async def get_job_status(job_id: str):
 
 @app.get("/jobs")
 async def list_jobs():
-    """
-    List all jobs (for admin/debugging)
-    """
+    """List all jobs"""
     return {
         "total": len(jobs_db),
         "jobs": list(jobs_db.values())
