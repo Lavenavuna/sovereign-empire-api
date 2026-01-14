@@ -16,6 +16,11 @@ import asyncio
 # Load environment variables
 load_dotenv()
 
+# Clear any proxy settings that might interfere with OpenAI
+for proxy_var in ['HTTP_PROXY', 'HTTPS_PROXY', 'http_proxy', 'https_proxy']:
+    if proxy_var in os.environ:
+        del os.environ[proxy_var]
+
 # Initialize FastAPI
 app = FastAPI(
     title="Sovereign Empire Content API",
@@ -37,7 +42,12 @@ api_key = os.environ.get("OPENAI_API_KEY")
 if not api_key:
     raise ValueError("OPENAI_API_KEY environment variable not set")
 
-openai_client = OpenAI(api_key=api_key)
+# Initialize with explicit configuration to avoid Railway proxy issues
+openai_client = OpenAI(
+    api_key=api_key,
+    timeout=120.0,
+    max_retries=2
+)
 
 # In-memory job storage
 jobs_db: Dict = {}
