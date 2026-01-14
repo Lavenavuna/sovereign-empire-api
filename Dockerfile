@@ -12,6 +12,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application files
 COPY api.py .
+COPY database.py .
 COPY create_content.py .
 
 # Create necessary directories
