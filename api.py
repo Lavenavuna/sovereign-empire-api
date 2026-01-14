@@ -5,6 +5,8 @@ With database, idempotency, audit logging, and WordPress auto-publishing
 
 from fastapi import FastAPI, HTTPException, BackgroundTasks, Header, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from typing import Optional, Dict, List
 import os
@@ -15,6 +17,7 @@ from dotenv import load_dotenv
 import hashlib
 import uuid
 from sqlalchemy.orm import Session
+from pathlib import Path
 
 # Import database models
 from database import (
@@ -619,6 +622,74 @@ async def retry_order(order_id: str, background_tasks: BackgroundTasks):
         })
         
         return {"success": True, "message": "Order queued for retry"}
+    
+    finally:
+        db.close()
+
+
+@app.get("/admin/dashboard", response_class=HTMLResponse)
+async def admin_dashboard():
+    """Serve the admin dashboard HTML"""
+    template_path = Path("templates/dashboard.html")
+    if not template_path.exists():
+        return HTMLResponse("<h1>Dashboard template not found</h1>", status_code=500)
+    return FileResponse(template_path)
+
+
+@app.get("/admin/order/{order_id}", response_class=HTMLResponse)
+async def admin_order_detail(order_id: str):
+    """Serve the order detail HTML"""
+    template_path = Path("templates/order_detail.html")
+    if not template_path.exists():
+        return HTMLResponse("<h1>Order detail template not found</h1>", status_code=500)
+    return FileResponse(template_path)
+
+
+@app.post("/admin/approve/{order_id}")
+async def approve_order(order_id: str):
+    """Approve an order and mark it as ready for publishing"""
+    db = get_session(engine)
+    
+    try:
+        order = db.query(Order).filter_by(id=order_id).first()
+        if not order:
+            raise HTTPException(status_code=404, detail="Order not found")
+        
+        if order.status != OrderStatus.PENDING_APPROVAL:
+            raise HTTPException(status_code=400, detail="Order not pending approval")
+        
+        # Mark as approved
+        order.status = OrderStatus.APPROVED
+        db.commit()
+        
+        log_action(db, "order_approved", "order", order_id, {
+            "approved_by": "admin"
+        })
+        
+        # If WordPress configured, publish now
+        if order.wordpress_site_url:
+            # Get blog content
+            blog_job = db.query(Job).filter_by(
+                order_id=order_id,
+                job_type="blog"
+            ).first()
+            
+            if blog_job and blog_job.generated_content:
+                wp_result = publish_to_wordpress(
+                    title=f"Content: {order.topic}",
+                    content=blog_job.generated_content,
+                    site_url=order.wordpress_site_url,
+                    status="publish"  # Publish live
+                )
+                
+                if wp_result["success"]:
+                    order.wordpress_post_id = wp_result["post_id"]
+                    order.wordpress_post_url = wp_result["post_url"]
+                    order.status = OrderStatus.COMPLETED
+                    db.commit()
+                    log_action(db, "wordpress_published_live", "order", order_id, wp_result)
+        
+        return {"success": True, "message": "Order approved"}
     
     finally:
         db.close()
