@@ -62,4 +62,4 @@ class Order(Base):
         nullable=False
     )
 
-    total_tokens_used = C
+    total_tokens_used = Column(Integer, default=0)
