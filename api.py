@@ -160,7 +160,7 @@ Blog excerpt: {blog_content[:500]}"""
 # Inngest Function - The Worker
 @inngest_client.create_function(
     fn_id="generate-content",
-    trigger=inngest_client.event("content/generate"),
+    trigger="content/generate",
     retries=2
 )
 async def generate_content_worker(ctx, step):
