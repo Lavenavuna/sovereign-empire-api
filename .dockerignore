@@ -1,0 +1,46 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Git
+.git/
+.gitignore
+
+# Environment files
+.env
+.env.local
+
+# Database files (local dev only)
+*.db
+*.sqlite
+*.sqlite3
+
+# Documentation
+README.md
+docs/
+
+# Tests
+tests/
+test_*.py
+*_test.py
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
