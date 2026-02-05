@@ -3,395 +3,223 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Blog Post Generation - Sovereign Empire</title>
+    <title>30-Day Google Visibility Kickstart | Local Business SEO</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background: #f5f5f5;
-        }
-        
-        .container {
-            max-width: 600px;
-            margin: 50px auto;
-            background: white;
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        
-        /* LIMITED OFFER BANNER */
-        .limited-offer {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            text-align: center;
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.02); }
-        }
-        
-        .limited-offer h2 {
-            font-size: 24px;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .limited-offer .offer-details {
-            font-size: 18px;
-            margin: 15px 0;
-            line-height: 1.8;
-        }
-        
-        .limited-offer .spots-remaining {
-            background: rgba(255,255,255,0.2);
-            padding: 10px 20px;
-            border-radius: 5px;
-            display: inline-block;
-            margin-top: 10px;
-            font-weight: bold;
-            font-size: 16px;
-        }
-        
-        .limited-offer .urgent {
-            font-size: 14px;
-            margin-top: 10px;
-            opacity: 0.9;
-        }
-        
-        h1 {
-            color: #667eea;
-            margin-bottom: 10px;
-            font-size: 32px;
-        }
-        
-        .subtitle {
-            color: #666;
-            margin-bottom: 30px;
-            font-size: 18px;
-        }
-        
-        .price-container {
-            text-align: center;
-            margin: 20px 0;
-        }
-        
-        .old-price {
-            text-decoration: line-through;
-            color: #999;
-            font-size: 24px;
-        }
-        
-        .price {
-            font-size: 48px;
-            color: #667eea;
-            font-weight: bold;
-            margin: 10px 0;
-        }
-        
-        .price-note {
-            color: #666;
-            font-size: 14px;
-            margin-bottom: 30px;
-        }
-        
-        .value-highlight {
-            background: #d1fae5;
-            color: #065f46;
-            padding: 15px;
-            border-radius: 5px;
-            margin: 20px 0;
-            text-align: center;
-            font-weight: bold;
-            font-size: 18px;
-        }
-        
-        .features {
-            list-style: none;
-            margin: 30px 0;
-        }
-        
-        .features li {
-            padding: 10px 0;
-            padding-left: 30px;
-            position: relative;
-        }
-        
-        .features li:before {
-            content: "✓";
-            position: absolute;
-            left: 0;
-            color: #667eea;
-            font-weight: bold;
-            font-size: 20px;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 500;
-            color: #333;
-        }
-        
-        input, textarea, select {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
-            font-family: inherit;
-        }
-        
-        textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-        
-        button {
-            width: 100%;
-            padding: 18px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 20px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: transform 0.2s;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-        
-        button:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        .success {
-            background: #d1fae5;
-            color: #065f46;
-            padding: 20px;
-            border-radius: 5px;
-            margin-top: 20px;
-            display: none;
-            border: 2px solid #059669;
-        }
-        
-        .error {
-            background: #fee2e2;
-            color: #991b1b;
-            padding: 15px;
-            border-radius: 5px;
-            margin-top: 20px;
-            display: none;
-        }
-        
-        .guarantee {
-            background: #fef3c7;
-            padding: 15px;
-            border-radius: 5px;
-            margin: 20px 0;
-            font-size: 14px;
-        }
-        
-        .testimonial-placeholder {
-            background: #f3f4f6;
-            padding: 20px;
-            border-radius: 5px;
-            margin: 20px 0;
-            font-style: italic;
-            color: #666;
-            border-left: 4px solid #667eea;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
+        .hero { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 80px 20px; text-align: center; }
+        .hero h1 { font-size: 48px; margin-bottom: 20px; line-height: 1.2; }
+        .hero h2 { font-size: 24px; margin-bottom: 30px; font-weight: 400; opacity: 0.95; }
+        .hero p { font-size: 18px; max-width: 700px; margin: 0 auto 40px; }
+        .cta-button { display: inline-block; background: #fff; color: #667eea; padding: 18px 40px; font-size: 20px; font-weight: 600; text-decoration: none; border-radius: 8px; transition: transform 0.2s; }
+        .cta-button:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .container { max-width: 1200px; margin: 0 auto; padding: 60px 20px; }
+        .problem { background: #f8f9fa; }
+        .problem h2 { font-size: 36px; margin-bottom: 30px; text-align: center; color: #333; }
+        .problem-list { max-width: 800px; margin: 0 auto; }
+        .problem-item { background: white; padding: 25px; margin-bottom: 20px; border-radius: 8px; border-left: 4px solid #667eea; }
+        .solution { background: white; }
+        .solution h2 { font-size: 36px; margin-bottom: 20px; text-align: center; color: #333; }
+        .solution-intro { text-align: center; font-size: 20px; margin-bottom: 50px; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .deliverables { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-bottom: 50px; }
+        .deliverable { background: #f8f9fa; padding: 30px; border-radius: 8px; }
+        .deliverable h3 { color: #667eea; margin-bottom: 15px; font-size: 22px; }
+        .deliverable ul { list-style: none; padding: 0; }
+        .deliverable li { padding: 8px 0; padding-left: 25px; position: relative; }
+        .deliverable li:before { content: "✓"; position: absolute; left: 0; color: #667eea; font-weight: bold; }
+        .promise { background: #fff8e1; padding: 40px; border-radius: 8px; text-align: center; margin-bottom: 50px; }
+        .promise h3 { color: #f57c00; margin-bottom: 15px; font-size: 24px; }
+        .promise p { font-size: 18px; line-height: 1.8; }
+        .pricing { background: #f8f9fa; }
+        .pricing h2 { font-size: 36px; margin-bottom: 50px; text-align: center; }
+        .price-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; max-width: 900px; margin: 0 auto; }
+        .price-card { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); text-align: center; }
+        .price-card.featured { border: 3px solid #667eea; transform: scale(1.05); }
+        .price-card h3 { font-size: 28px; margin-bottom: 10px; color: #667eea; }
+        .price-card .price { font-size: 48px; font-weight: bold; color: #333; margin: 20px 0; }
+        .price-card ul { list-style: none; padding: 0; text-align: left; margin: 30px 0; }
+        .price-card li { padding: 12px 0; border-bottom: 1px solid #eee; }
+        .for-who { background: white; text-align: center; }
+        .for-who h2 { font-size: 36px; margin-bottom: 30px; }
+        .for-who p { font-size: 20px; max-width: 800px; margin: 0 auto 40px; line-height: 1.8; }
     </style>
 </head>
 <body>
+
+<!-- HERO SECTION -->
+<section class="hero">
+    <h1>Turn Your Website Into a Lead Source,<br>Not Just an Online Brochure</h1>
+    <h2>30-Day Google Visibility Kickstart for Local Businesses</h2>
+    <p>We help Google clearly understand what you do, where you operate, and who you're for—so your site attracts local customers actively searching for your services.</p>
+    <a href="#order" class="cta-button">Get Started - $149</a>
+</section>
+
+<!-- PROBLEM SECTION -->
+<section class="problem">
     <div class="container">
-        <!-- LIMITED TIME OFFER BANNER -->
-        <div class="limited-offer">
-            <h2>🎉 Limited Launch Offer 🎉</h2>
-            <div class="offer-details">
-                <strong>First 50 Customers Only:</strong><br>
-                Pay for 1 Blog Post → Get 2 FREE!<br>
-                <span style="font-size: 22px;">3 Blog Posts for Just $79</span>
+        <h2>Does This Sound Familiar?</h2>
+        <div class="problem-list">
+            <div class="problem-item">
+                <strong>📉 Your website exists but doesn't bring customers</strong>
+                <p>You paid for a website, but it just sits there. No traffic. No calls. No messages.</p>
             </div>
-            <div class="spots-remaining">
-                ⏰ Limited Spots Remaining
+            <div class="problem-item">
+                <strong>🔍 When people Google your service, they find your competitors</strong>
+                <p>Your business is great, but Google doesn't understand what you do or where you operate.</p>
             </div>
-            <div class="urgent">
-                Don't miss this exclusive launch pricing!
+            <div class="problem-item">
+                <strong>💸 You're spending on ads because organic traffic doesn't exist</strong>
+                <p>Every customer costs you money because your website isn't doing its job.</p>
+            </div>
+            <div class="problem-item">
+                <strong>⏰ You don't have time to figure out SEO yourself</strong>
+                <p>You're running a business. Learning keywords, backlinks, and content strategy isn't why you started.</p>
             </div>
         </div>
-        
-        <h1>AI-Powered Blog Posts</h1>
-        <p class="subtitle">Professional content delivered in 24 hours</p>
-        
-        <div class="price-container">
-            <div class="old-price">$237 value</div>
-            <div class="price">$79</div>
-            <p class="price-note">Launch Special: Includes human review & editing</p>
-        </div>
-        
-        <div class="value-highlight">
-            🎁 You Get 3 Professional Blog Posts for the Price of 1!
-        </div>
-        
-        <ul class="features">
-            <li><strong>3 blog posts</strong> (1200-1500 words each)</li>
-            <li>AI-generated, human-reviewed</li>
-            <li>Published to your WordPress site</li>
-            <li>24-hour delivery per post</li>
-            <li>Free revisions on all posts</li>
-            <li>Satisfaction guaranteed</li>
-        </ul>
-        
-        <div class="guarantee">
-            <strong>100% Satisfaction Guarantee:</strong> If you're not happy with the content, we'll revise it for free or give you a full refund. No questions asked.
-        </div>
-        
-        <form id="orderForm">
-            <div class="form-group">
-                <label for="email">Your Email *</label>
-                <input type="email" id="email" name="email" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="name">Your Name</label>
-                <input type="text" id="name" name="name">
-            </div>
-            
-            <div class="form-group">
-                <label for="topic">First Blog Post Topic *</label>
-                <textarea id="topic" name="topic" required placeholder="e.g., The Future of AI in Healthcare"></textarea>
-                <small style="color: #666; font-size: 12px;">We'll contact you for topics 2 & 3 after your order</small>
-            </div>
-            
-            <div class="form-group">
-                <label for="industry">Industry (Optional)</label>
-                <select id="industry" name="industry">
-                    <option value="">-- Select Industry --</option>
-                    <option value="Technology">Technology</option>
-                    <option value="Healthcare">Healthcare</option>
-                    <option value="Finance">Finance</option>
-                    <option value="Real Estate">Real Estate</option>
-                    <option value="Marketing">Marketing</option>
-                    <option value="Education">Education</option>
-                    <option value="Other">Other</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label for="tone">Tone (Optional)</label>
-                <select id="tone" name="tone">
-                    <option value="professional">Professional</option>
-                    <option value="casual">Casual</option>
-                    <option value="technical">Technical</option>
-                    <option value="friendly">Friendly</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label for="wordpress_url">WordPress Site URL (Optional)</label>
-                <input type="url" id="wordpress_url" name="wordpress_url" placeholder="https://yourblog.com">
-                <small style="color: #666; font-size: 12px;">We'll publish directly to your site if provided</small>
-            </div>
-            
-            <button type="submit" id="submitBtn">Claim Your 3 Posts for $79!</button>
-        </form>
-        
-        <div id="successMessage" class="success"></div>
-        <div id="errorMessage" class="error"></div>
     </div>
-    
-    <script>
-        const form = document.getElementById('orderForm');
-        const submitBtn = document.getElementById('submitBtn');
-        const successMessage = document.getElementById('successMessage');
-        const errorMessage = document.getElementById('errorMessage');
+</section>
+
+<!-- SOLUTION SECTION -->
+<section class="solution">
+    <div class="container">
+        <h2>The 30-Day Google Visibility Kickstart</h2>
+        <p class="solution-intro">We build the foundation that turns your website and Google Business Profile into a lead-generating machine.</p>
         
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
+        <div class="deliverables">
+            <div class="deliverable">
+                <h3>🎯 3 SEO-Optimized Blog Posts</h3>
+                <ul>
+                    <li>Targeted to YOUR service + YOUR location</li>
+                    <li>Written to rank, not just "sound nice"</li>
+                    <li>Answer questions your customers actually search</li>
+                </ul>
+            </div>
             
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Processing...';
+            <div class="deliverable">
+                <h3>📄 1 Service Page Rewrite</h3>
+                <ul>
+                    <li>Clear, conversion-focused copy</li>
+                    <li>Structured for local search intent</li>
+                    <li>Turns visitors into leads</li>
+                </ul>
+            </div>
             
-            successMessage.style.display = 'none';
-            errorMessage.style.display = 'none';
+            <div class="deliverable">
+                <h3>📍 Google Business Profile Content</h3>
+                <ul>
+                    <li>1 optimized GMB post</li>
+                    <li>Keyword-aligned with your service</li>
+                    <li>Location-targeted</li>
+                </ul>
+            </div>
             
-            const formData = {
-                customer_email: document.getElementById('email').value,
-                customer_name: document.getElementById('name').value || null,
-                tenant_id: 'DIRECT_CUSTOMER',
-                topic: document.getElementById('topic').value,
-                industry: document.getElementById('industry').value || null,
-                tone: document.getElementById('tone').value || 'professional'
-            };
+            <div class="deliverable">
+                <h3>🔑 Keyword & Intent Targeting</h3>
+                <ul>
+                    <li>Primary keyword research</li>
+                    <li>Supporting long-tail keywords</li>
+                    <li>Local modifiers baked in</li>
+                </ul>
+            </div>
             
-            try {
-                const response = await fetch('https://sovereign-empire-api-production.up.railway.app/api/orders/create', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(formData)
-                });
-                
-                const data = await response.json();
-                
-                if (response.ok) {
-                    successMessage.innerHTML = `
-                        <strong>🎉 Order Received!</strong><br>
-                        Order ID: ${data.order_id}<br><br>
-                        <strong>You're getting 3 blog posts for $79!</strong><br><br>
-                        We'll send you a PayPal payment link shortly at ${formData.customer_email}.<br><br>
-                        After payment, we'll contact you for topics 2 & 3, then deliver all 3 posts within 72 hours.<br><br>
-                        <em>Thank you for being one of our first 50 customers!</em>
-                    `;
-                    successMessage.style.display = 'block';
-                    
-                    form.reset();
-                    
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'Claim Your 3 Posts for $79!';
-                } else {
-                    errorMessage.textContent = 'Error: ' + (data.detail || 'Something went wrong');
-                    errorMessage.style.display = 'block';
-                    
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'Claim Your 3 Posts for $79!';
-                }
-                
-            } catch (error) {
-                errorMessage.textContent = 'Network error. Please try again.';
-                errorMessage.style.display = 'block';
-                
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Claim Your 3 Posts for $79!';
-            }
-        });
-    </script>
+            <div class="deliverable">
+                <h3>✅ Human Review & Optimization</h3>
+                <ul>
+                    <li>No raw AI content</li>
+                    <li>Readable and credible</li>
+                    <li>Publish-ready</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="promise">
+            <h3>⚠️ What We Promise (and Don't)</h3>
+            <p><strong>We DO NOT promise rankings or guaranteed leads.</strong></p>
+            <p><strong>We DO promise:</strong> We help Google clearly understand what you do, where you operate, and who you're for—so your site and GMB are positioned to attract local search traffic.</p>
+        </div>
+    </div>
+</section>
+
+<!-- PRICING SECTION -->
+<section class="pricing">
+    <div class="container">
+        <h2>Simple, Transparent Pricing</h2>
+        <div class="price-cards">
+            <div class="price-card">
+                <h3>One-Time Kickstart</h3>
+                <div class="price">$149</div>
+                <p>Perfect for getting started</p>
+                <ul>
+                    <li>✓ 3 SEO blog posts</li>
+                    <li>✓ 1 service page rewrite</li>
+                    <li>✓ 1 GMB post</li>
+                    <li>✓ Keyword targeting</li>
+                    <li>✓ 30-day delivery</li>
+                </ul>
+                <a href="#order" class="cta-button">Get Started</a>
+            </div>
+            
+            <div class="price-card featured">
+                <h3>Ongoing Growth</h3>
+                <div class="price">$399<span style="font-size: 20px;">/mo</span></div>
+                <p>For serious lead generation</p>
+                <ul>
+                    <li>✓ 4 SEO content updates/month</li>
+                    <li>✓ 4 GMB posts/month</li>
+                    <li>✓ Ongoing keyword refinement</li>
+                    <li>✓ Quarterly page refresh</li>
+                    <li>✓ Priority support</li>
+                </ul>
+                <a href="#order" class="cta-button">Inquire Now</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- WHO IT'S FOR -->
+<section class="for-who">
+    <div class="container">
+        <h2>Who This Is For</h2>
+        <p><strong>Local service businesses</strong> who depend on customers finding them via Google.</p>
+        <p>Examples: Cleaning services, trades, dental practices, salons, car detailing, home services, professional services.</p>
+        <p><strong>This is NOT for:</strong> E-commerce stores, national brands, or businesses without a local service area.</p>
+    </div>
+</section>
+
+<!-- ORDER FORM -->
+<section id="order" class="container">
+    <h2 style="text-align: center; margin-bottom: 40px;">Ready to Get Started?</h2>
+    <form action="https://sovereign-empire-api-production.up.railway.app/api/orders/create" method="POST" style="max-width: 600px; margin: 0 auto; background: #f8f9fa; padding: 40px; border-radius: 12px;">
+        <div style="margin-bottom: 20px;">
+            <label style="display: block; margin-bottom: 8px; font-weight: 600;">Business Name</label>
+            <input type="text" name="customer_name" required style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 16px;">
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+            <label style="display: block; margin-bottom: 8px; font-weight: 600;">Email</label>
+            <input type="email" name="customer_email" required style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 16px;">
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+            <label style="display: block; margin-bottom: 8px; font-weight: 600;">Business Type (e.g., Dental Practice, Cleaning Service)</label>
+            <input type="text" name="industry" required style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 16px;">
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+            <label style="display: block; margin-bottom: 8px; font-weight: 600;">Primary Service You Want to Rank For</label>
+            <input type="text" name="topic" placeholder="e.g., Dental Implants in Suva" required style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 16px;">
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+            <label style="display: block; margin-bottom: 8px; font-weight: 600;">Website URL (if you have one)</label>
+            <input type="url" name="wordpress_url" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 16px;">
+        </div>
+        
+        <button type="submit" style="width: 100%; background: #667eea; color: white; padding: 16px; border: none; border-radius: 6px; font-size: 18px; font-weight: 600; cursor: pointer;">
+            Start My 30-Day Kickstart - $149
+        </button>
+    </form>
+</section>
+
 </body>
 </html>
