@@ -2,6 +2,7 @@
 <section id="order" class="container">
     <h2 style="text-align: center; margin-bottom: 40px;">Ready to Get Started?</h2>
     
+    <!-- IMPORTANT: NO action or method attributes! Let JavaScript handle it -->
     <form id="orderForm" style="max-width: 600px; margin: 0 auto; background: #f8f9fa; padding: 40px; border-radius: 12px;">
         <div style="margin-bottom: 20px;">
             <label style="display: block; margin-bottom: 8px; font-weight: 600;">Business Name</label>
@@ -14,7 +15,7 @@
         </div>
         
         <div style="margin-bottom: 20px;">
-            <label style="display: block; margin-bottom: 8px; font-weight: 600;">Business Type (e.g., Dental Practice, Cleaning Service)</label>
+            <label style="display: block; margin-bottom: 8px; font-weight: 600;">Business Type</label>
             <input type="text" id="industry" name="industry" required style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 16px;">
         </div>
         
@@ -24,121 +25,112 @@
         </div>
         
         <div style="margin-bottom: 20px;">
-            <label style="display: block; margin-bottom: 8px; font-weight: 600;">Website URL (if you have one)</label>
+            <label style="display: block; margin-bottom: 8px; font-weight: 600;">Website URL (optional)</label>
             <input type="url" id="wordpress_url" name="wordpress_url" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 16px;">
         </div>
         
+        <!-- Success/Error Message Area -->
         <div id="message" style="margin-bottom: 20px; padding: 15px; border-radius: 6px; display: none;"></div>
         
-        <button type="submit" id="submitBtn" style="width: 100%; background: #667eea; color: white; padding: 16px; border: none; border-radius: 6px; font-size: 18px; font-weight: 600; cursor: pointer;">
+        <button type="submit" id="submitBtn" style="width: 100%; background: #667eea; color: white; padding: 16px; border: none; border-radius: 6px; font-size: 18px; font-weight: 600; cursor: pointer; transition: opacity 0.2s;">
             Start My 30-Day Kickstart - $149
         </button>
     </form>
 </section>
 
+<!-- JavaScript MUST be after the form -->
 <script>
 document.getElementById('orderForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
+    e.preventDefault(); // CRITICAL: Stop normal form submission
     
     const submitBtn = document.getElementById('submitBtn');
     const messageDiv = document.getElementById('message');
     
-    // Disable button and show loading
+    // Show loading state
     submitBtn.disabled = true;
+    submitBtn.style.opacity = '0.6';
     submitBtn.textContent = 'Processing...';
     messageDiv.style.display = 'none';
     
-    // Get form data
-    const data = {
-        customer_name: document.getElementById('customer_name').value,
-        customer_email: document.getElementById('customer_email').value,
-        industry: document.getElementById('industry').value,
-        topic: document.getElementById('topic').value,
-        wordpress_url: document.getElementById('wordpress_url').value || '',
-        tenant_id: "DIRECT_CUSTOMER"
+    // Get form values
+    const formData = {
+        customer_name: document.getElementById('customer_name').value.trim(),
+        customer_email: document.getElementById('customer_email').value.trim(),
+        industry: document.getElementById('industry').value.trim(),
+        topic: document.getElementById('topic').value.trim(),
+        wordpress_url: document.getElementById('wordpress_url').value.trim() || '',
+        tenant_id: 'DIRECT_CUSTOMER'
     };
+    
+    console.log('Submitting data:', formData); // Debug log
     
     try {
         const response = await fetch('https://sovereign-empire-api-production.up.railway.app/api/orders/create', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Accept': 'application/json'
             },
-            body: JSON.stringify(data)
+            body: JSON.stringify(formData)
         });
         
-        // Check if request was successful (even if API returns error, order might be created)
-        if (response.status === 200 || response.status === 201) {
-            try {
-                const result = await response.json();
-                
-                // Success
-                messageDiv.style.display = 'block';
-                messageDiv.style.background = '#d4edda';
-                messageDiv.style.color = '#155724';
-                messageDiv.style.border = '1px solid #c3e6cb';
-                messageDiv.innerHTML = `
-                    <strong>✅ Order Received!</strong><br><br>
-                    <strong>What happens next:</strong><br>
-                    1. Check your email (${data.customer_email}) for payment instructions<br>
-                    2. Pay via PayPal to confirm your order<br>
-                    3. We'll start your 30-Day Google Visibility Kickstart immediately<br><br>
-                    <strong>Questions?</strong> Reply to the confirmation email.
-                `;
-                
-                // Reset form
-                document.getElementById('orderForm').reset();
-                
-                // Scroll to message
-                messageDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                
-            } catch (jsonError) {
-                // Response wasn't JSON, but order was likely created
-                messageDiv.style.display = 'block';
-                messageDiv.style.background = '#d4edda';
-                messageDiv.style.color = '#155724';
-                messageDiv.style.border = '1px solid #c3e6cb';
-                messageDiv.innerHTML = `
-                    <strong>✅ Order Received!</strong><br><br>
-                    <strong>What happens next:</strong><br>
-                    1. Check your email (${data.customer_email}) for payment instructions<br>
-                    2. Pay via PayPal to confirm your order<br>
-                    3. We'll start your 30-Day Google Visibility Kickstart immediately<br><br>
-                    <strong>Questions?</strong> Reply to the confirmation email.
-                `;
-                
-                // Reset form
-                document.getElementById('orderForm').reset();
-                
-                // Scroll to message
-                messageDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
+        console.log('Response status:', response.status); // Debug log
+        
+        // Check if successful
+        if (response.ok || response.status === 201) {
+            // Show success message
+            messageDiv.style.display = 'block';
+            messageDiv.style.background = '#d4edda';
+            messageDiv.style.color = '#155724';
+            messageDiv.style.border = '1px solid #c3e6cb';
+            messageDiv.innerHTML = `
+                <strong>✅ Order Received!</strong><br><br>
+                <strong>What happens next:</strong><br>
+                1. Check your email (${formData.customer_email}) for payment instructions<br>
+                2. Pay via PayPal to confirm your order ($149)<br>
+                3. We'll start your 30-Day Google Visibility Kickstart<br><br>
+                <strong>Questions?</strong> Reply to the confirmation email or contact sretonia@gmail.com
+            `;
+            
+            // Reset form
+            document.getElementById('orderForm').reset();
+            
+            // Scroll to success message
+            messageDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
             
         } else {
-            // Error response
-            const errorText = await response.text();
-            throw new Error('Submission failed. Please try again or contact us directly.');
+            // Show error
+            const errorData = await response.json().catch(() => ({ detail: 'Unknown error' }));
+            throw new Error(errorData.detail || 'Submission failed');
         }
         
     } catch (error) {
+        console.error('Submission error:', error); // Debug log
+        
+        // Show error message with email fallback
         messageDiv.style.display = 'block';
         messageDiv.style.background = '#f8d7da';
         messageDiv.style.color = '#721c24';
         messageDiv.style.border = '1px solid #f5c6cb';
         messageDiv.innerHTML = `
             <strong>❌ Submission Error</strong><br><br>
-            There was a problem submitting your order.<br><br>
-            <strong>Please email us directly:</strong><br>
-            <a href="mailto:sretonia@gmail.com?subject=Order%20Request&body=Business%20Name:%20${encodeURIComponent(data.customer_name)}%0AEmail:%20${encodeURIComponent(data.customer_email)}%0ABusiness%20Type:%20${encodeURIComponent(data.industry)}%0AService:%20${encodeURIComponent(data.topic)}%0AWebsite:%20${encodeURIComponent(data.wordpress_url)}" style="color: #721c24; font-weight: bold;">sretonia@gmail.com</a><br><br>
-            Or call: [Your Phone Number]
+            Please email us directly to place your order:<br><br>
+            <a href="mailto:sretonia@gmail.com?subject=Order Request - ${encodeURIComponent(formData.industry)}&body=Business Name: ${encodeURIComponent(formData.customer_name)}%0AEmail: ${encodeURIComponent(formData.customer_email)}%0ABusiness Type: ${encodeURIComponent(formData.industry)}%0AService: ${encodeURIComponent(formData.topic)}%0AWebsite: ${encodeURIComponent(formData.wordpress_url)}" 
+               style="color: #721c24; font-weight: bold; text-decoration: underline;">
+                Click here to email: sretonia@gmail.com
+            </a><br><br>
+            <small>Error details: ${error.message}</small>
         `;
         
-        // Scroll to error message
         messageDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
     } finally {
-        // Re-enable button
+        // Reset button
         submitBtn.disabled = false;
+        submitBtn.style.opacity = '1';
         submitBtn.textContent = 'Start My 30-Day Kickstart - $149';
     }
 });
+
+// Test if JavaScript is loaded
+console.log('Order form JavaScript loaded successfully');
 </script>
