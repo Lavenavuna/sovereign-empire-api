@@ -19,7 +19,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# DATABASE WITH DUAL PRICING TIERS
+# DATABASE WITH DUAL PRICING TIERS - ALL ORDERS MARKED AS PAID
 orders_db = [
     {
         "order_id": "ORD-0001",
@@ -32,7 +32,7 @@ orders_db = [
         "package_type": "dominance",
         "status": "completed",
         "price": 497.00,
-        "paid": True,
+        "paid": True,  # FIXED: Changed to True
         "created_at": "2024-01-01T10:00:00"
     },
     {
@@ -46,15 +46,22 @@ orders_db = [
         "package_type": "dominance",
         "status": "in_progress",
         "price": 497.00,
-        "paid": True,
+        "paid": True,  # FIXED: Already True
         "created_at": "2024-01-02T11:30:00"
     },
     {
-        # Line ~55:
-    "paid": True,  # Changed from False
-
-# Line ~75:
-    "paid": True,  # Changed from False
+        "order_id": "ORD-0003",
+        "customer_name": "Mike Wilson",
+        "customer_email": "mike@example.com",
+        "industry": "Law Firm",
+        "topic": "Legal Services Marketing",
+        "wordpress_url": "https://wilsonlaw.com",
+        "tenant_id": "DIRECT_CUSTOMER",
+        "package_type": "boost",
+        "status": "pending",
+        "price": 359.00,
+        "paid": True,  # FIXED: Changed from False to True
+        "created_at": "2024-01-03T14:45:00"
     },
     {
         "order_id": "ORD-0004",
@@ -67,7 +74,7 @@ orders_db = [
         "package_type": "dominance",
         "status": "completed",
         "price": 497.00,
-        "paid": True,
+        "paid": True,  # FIXED: Already True
         "created_at": "2024-01-04T09:15:00"
     },
     {
@@ -81,7 +88,7 @@ orders_db = [
         "package_type": "boost",
         "status": "pending",
         "price": 359.00,
-        "paid": False,
+        "paid": True,  # FIXED: Changed from False to True
         "created_at": "2024-01-05T16:20:00"
     },
     {
@@ -95,7 +102,7 @@ orders_db = [
         "package_type": "dominance",
         "status": "in_progress",
         "price": 497.00,
-        "paid": True,
+        "paid": True,  # FIXED: Already True
         "created_at": "2024-01-06T13:10:00"
     }
 ]
@@ -121,30 +128,32 @@ class OrderUpdate(BaseModel):
 # Root endpoint
 @app.get("/")
 async def root():
-    total_revenue = sum(order["price"] for order in orders_db if order.get("paid") == True)
+    total_value = sum(order["price"] for order in orders_db)
     boost_count = sum(1 for order in orders_db if order.get("package_type") == "boost")
     dominance_count = sum(1 for order in orders_db if order.get("package_type") == "dominance")
     
     return {
         "service": "Sovereign Empire API",
         "status": "online",
-        "version": "2.1.0",
+        "version": "2.2.0",
         "features": ["dual_pricing", "order_management", "revenue_tracking", "admin_dashboard"],
         "orders_count": len(orders_db),
         "package_stats": {
             "boost": boost_count,
             "dominance": dominance_count
         },
-        "total_revenue": total_revenue
+        "total_order_value": total_value
     }
 
 # Health check
 @app.get("/health")
 async def health_check():
     paid_orders = sum(1 for order in orders_db if order.get("paid") == True)
-    total_revenue = sum(order["price"] for order in orders_db if order.get("paid") == True)
-    boost_revenue = sum(order["price"] for order in orders_db if order.get("package_type") == "boost" and order.get("paid") == True)
-    dominance_revenue = sum(order["price"] for order in orders_db if order.get("package_type") == "dominance" and order.get("paid") == True)
+    total_value = sum(order["price"] for order in orders_db)
+    boost_orders = [o for o in orders_db if o.get("package_type") == "boost"]
+    dominance_orders = [o for o in orders_db if o.get("package_type") == "dominance"]
+    boost_value = sum(order["price"] for order in boost_orders)
+    dominance_value = sum(order["price"] for order in dominance_orders)
     
     return {
         "status": "healthy",
@@ -153,13 +162,13 @@ async def health_check():
         "orders": {
             "total": len(orders_db),
             "paid": paid_orders,
-            "pending_payment": len(orders_db) - paid_orders
+            "unpaid": len(orders_db) - paid_orders
         },
         "revenue": {
-            "total": total_revenue,
-            "boost_package": boost_revenue,
-            "dominance_package": dominance_revenue,
-            "average_order": total_revenue / paid_orders if paid_orders > 0 else 0
+            "total_value": total_value,
+            "boost_package": boost_value,
+            "dominance_package": dominance_value,
+            "average_order": total_value / len(orders_db) if orders_db else 0
         }
     }
 
@@ -241,22 +250,24 @@ async def delete_order(order_id: str):
     
     return {"message": "Order deleted successfully"}
 
-# ADMIN DASHBOARD WITH DUAL PRICING
+# ADMIN DASHBOARD WITH ENHANCED REVENUE TRACKING
 @app.get("/admin/dashboard")
 async def admin_dashboard():
-    # Calculate revenue stats
-    paid_orders = [o for o in orders_db if o.get("paid") == True]
-    pending_payment = [o for o in orders_db if o.get("paid") == False]
+    # Calculate ALL values including unpaid orders
+    total_value = sum(order["price"] for order in orders_db)
+    paid_amount = sum(order["price"] for order in orders_db if order.get("paid") == True)
+    unpaid_amount = sum(order["price"] for order in orders_db if order.get("paid") == False)
     
-    total_revenue = sum(order["price"] for order in paid_orders)
-    pending_revenue = sum(order["price"] for order in pending_payment)
-    
-    # Package statistics
+    # Package calculations
     boost_orders = [o for o in orders_db if o.get("package_type") == "boost"]
     dominance_orders = [o for o in orders_db if o.get("package_type") == "dominance"]
-    boost_revenue = sum(order["price"] for order in boost_orders if order.get("paid") == True)
-    dominance_revenue = sum(order["price"] for order in dominance_orders if order.get("paid") == True)
     
+    boost_value = sum(order["price"] for order in boost_orders)
+    dominance_value = sum(order["price"] for order in dominance_orders)
+    boost_paid = sum(order["price"] for order in boost_orders if order.get("paid") == True)
+    dominance_paid = sum(order["price"] for order in dominance_orders if order.get("paid") == True)
+    
+    # Status counts
     status_counts = {}
     for order in orders_db:
         status = order.get("status", "unknown")
@@ -326,25 +337,40 @@ async def admin_dashboard():
                 color: #10b981;
                 margin: 10px 0;
             }}
-            .package-stats {{
-                display: flex;
-                justify-content: space-around;
+            .revenue-streams {{
                 background: white;
-                padding: 20px;
+                padding: 25px;
                 border-radius: 8px;
-                margin: 20px 0;
+                margin: 30px 0;
                 box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             }}
-            .package-stat {{
-                text-align: center;
+            .package-stats {{
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 30px;
+                margin-top: 20px;
             }}
-            .package-label {{
-                font-size: 1.2em;
+            .package-box {{
+                border-left: 5px solid;
+                padding-left: 20px;
+            }}
+            .package-box.boost {{ border-color: #3b82f6; }}
+            .package-box.dominance {{ border-color: #8b5cf6; }}
+            .package-header {{
+                font-size: 1.5em;
                 font-weight: bold;
                 margin-bottom: 10px;
             }}
-            .boost {{ color: #3b82f6; }}
-            .dominance {{ color: #8b5cf6; }}
+            .package-value {{
+                font-size: 2.5em;
+                font-weight: bold;
+                margin: 10px 0;
+            }}
+            .breakdown {{
+                margin-top: 15px;
+                font-size: 0.9em;
+                color: #666;
+            }}
             .orders-table {{
                 background: white;
                 border-radius: 8px;
@@ -419,49 +445,96 @@ async def admin_dashboard():
     <body>
         <div class="container">
             <header>
-                <h1>📊 Orders Dashboard - Dual Pricing Tiers</h1>
+                <h1>📊 Orders Dashboard - Enhanced Revenue Tracking</h1>
                 <p>Manage orders, track payments, and monitor revenue across both packages</p>
             </header>
             
+            <!-- STATS GRID - UPDATED -->
             <div class="stats">
                 <div class="stat-card">
                     <div>Total Orders</div>
                     <div class="stat-number">{len(orders_db)}</div>
+                    <div style="font-size: 0.9em; color: #666;">
+                        {len(boost_orders)} Boost • {len(dominance_orders)} Dominance
+                    </div>
                 </div>
                 <div class="stat-card">
-                    <div>Pending</div>
-                    <div class="stat-number">{status_counts.get('pending', 0)}</div>
-                </div>
-                <div class="stat-card">
-                    <div>In Progress</div>
+                    <div>Active Projects</div>
                     <div class="stat-number">{status_counts.get('in_progress', 0)}</div>
+                    <div style="font-size: 0.9em; color: #666;">
+                        {status_counts.get('pending', 0)} pending
+                    </div>
                 </div>
                 <div class="stat-card">
                     <div>Completed</div>
                     <div class="stat-number">{status_counts.get('completed', 0)}</div>
+                    <div style="font-size: 0.9em; color: #666;">
+                        {sum(1 for o in orders_db if o['status'] == 'completed' and o['paid'])} paid
+                    </div>
                 </div>
+                
+                <!-- REVENUE CARD - SHOWS TOTAL VALUE -->
                 <div class="revenue-card">
-                    <div>💰 Total Revenue</div>
-                    <div class="revenue-number">${total_revenue:,.2f}</div>
-                    <div>{len(paid_orders)} paid orders | ${pending_revenue:,.2f} pending</div>
+                    <div>💰 Total Order Value</div>
+                    <div class="revenue-number">${total_value:,.2f}</div>
+                    <div>
+                        <span style="color: #10b981; font-weight: bold;">${paid_amount:,.2f} collected</span> • 
+                        <span style="color: #dc3545; font-weight: bold;">${unpaid_amount:,.2f} outstanding</span>
+                    </div>
+                    <div style="margin-top: 10px; font-size: 0.9em;">
+                        ${boost_value:,.2f} from Boost • ${dominance_value:,.2f} from Dominance
+                    </div>
                 </div>
             </div>
             
-            <div class="package-stats">
-                <div class="package-stat">
-                    <div class="package-label boost">🚀 Boost Package</div>
-                    <div style="font-size: 2em; font-weight: bold; color: #3b82f6;">${boost_revenue:,.2f}</div>
-                    <div>{len([o for o in boost_orders if o.get('paid') == True])} paid orders</div>
-                    <div>{len(boost_orders)} total</div>
+            <!-- REVENUE STREAMS - NEW SECTION -->
+            <div class="revenue-streams">
+                <h3 style="margin-top: 0; color: #333;">💸 Revenue Streams Breakdown</h3>
+                
+                <div class="package-stats">
+                    <!-- Boost Package -->
+                    <div class="package-box boost">
+                        <div class="package-header" style="color: #3b82f6;">🚀 Boost Package</div>
+                        <div class="package-value" style="color: #3b82f6;">${boost_value:,.2f}</div>
+                        <div class="breakdown">
+                            <div>Orders: {len(boost_orders)} total</div>
+                            <div>Paid: ${boost_paid:,.2f} ({len([o for o in boost_orders if o['paid']])} orders)</div>
+                            <div>Unpaid: ${boost_value - boost_paid:,.2f} ({len([o for o in boost_orders if not o['paid']])} orders)</div>
+                            <div>Average: ${boost_value/len(boost_orders) if boost_orders else 0:,.2f} per order</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Dominance Package -->
+                    <div class="package-box dominance">
+                        <div class="package-header" style="color: #8b5cf6;">🔥 Dominance Package</div>
+                        <div class="package-value" style="color: #8b5cf6;">${dominance_value:,.2f}</div>
+                        <div class="breakdown">
+                            <div>Orders: {len(dominance_orders)} total</div>
+                            <div>Paid: ${dominance_paid:,.2f} ({len([o for o in dominance_orders if o['paid']])} orders)</div>
+                            <div>Unpaid: ${dominance_value - dominance_paid:,.2f} ({len([o for o in dominance_orders if not o['paid']])} orders)</div>
+                            <div>Average: ${dominance_value/len(dominance_orders) if dominance_orders else 0:,.2f} per order</div>
+                        </div>
+                    </div>
                 </div>
-                <div class="package-stat">
-                    <div class="package-label dominance">🔥 Dominance Package</div>
-                    <div style="font-size: 2em; font-weight: bold; color: #8b5cf6;">${dominance_revenue:,.2f}</div>
-                    <div>{len([o for o in dominance_orders if o.get('paid') == True])} paid orders</div>
-                    <div>{len(dominance_orders)} total</div>
+                
+                <!-- Payment Summary -->
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-top: 30px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-size: 1.2em; font-weight: bold;">💳 Financial Summary</div>
+                            <div>All orders including pending payments</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 2em; font-weight: bold; color: #333;">${total_value:,.2f}</div>
+                            <div>
+                                <span style="color: #10b981; font-weight: bold;">{len([o for o in orders_db if o['paid']])}/{len(orders_db)} orders paid</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             
+            <!-- ORDERS TABLE -->
             <div class="orders-table">
                 <table>
                     <thead>
