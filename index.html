@@ -5,128 +5,82 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>30-Day Google Visibility Kickstart | Local Business SEO</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
-            line-height: 1.6; 
-            color: #333;
-        }
-        .hero { 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-            color: white; 
-            padding: 80px 20px; 
-            text-align: center; 
-            min-height: 100vh;
+        /* Add to your existing CSS */
+        .pricing-tiers {
             display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-        .hero h1 { 
-            font-size: 48px; 
-            margin-bottom: 20px; 
-            line-height: 1.2; 
-        }
-        .hero h2 { 
-            font-size: 24px; 
-            margin-bottom: 30px; 
-            font-weight: 400; 
-            opacity: 0.95; 
-        }
-        .hero p { 
-            font-size: 20px; 
-            max-width: 700px; 
-            margin: 0 auto 50px; 
-            line-height: 1.8;
-        }
-        .cta-buttons {
-            display: flex;
-            gap: 20px;
+            gap: 30px;
             justify-content: center;
             flex-wrap: wrap;
+            margin: 50px 0;
         }
-        .cta-button { 
-            display: inline-block; 
-            background: #fff; 
-            color: #667eea; 
-            padding: 20px 40px; 
-            font-size: 20px; 
-            font-weight: 600; 
-            text-decoration: none; 
-            border-radius: 8px; 
-            transition: transform 0.2s; 
-        }
-        .cta-button:hover { 
-            transform: translateY(-2px); 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3); 
-        }
-        .cta-button.secondary {
-            background: transparent;
-            color: white;
-            border: 2px solid white;
-        }
-        .container { 
-            max-width: 1200px; 
-            margin: 0 auto; 
-            padding: 60px 20px; 
-        }
-        .section { 
-            margin-bottom: 60px; 
-        }
-        .section h2 { 
-            font-size: 36px; 
-            margin-bottom: 30px; 
-            text-align: center; 
-            color: #333; 
-        }
-        .benefits { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
-            gap: 30px; 
-            margin-top: 40px; 
-        }
-        .benefit { 
-            background: #f8f9fa; 
-            padding: 30px; 
-            border-radius: 8px; 
-        }
-        .benefit h3 { 
-            color: #667eea; 
-            margin-bottom: 15px; 
-            font-size: 22px; 
-        }
-        .pricing { 
-            background: #f8f9fa; 
-            padding: 60px 20px; 
-            text-align: center; 
-        }
-        .price { 
-            font-size: 64px; 
-            font-weight: bold; 
-            color: #667eea; 
-            margin: 20px 0; 
-        }
-        .price-note { 
-            font-size: 18px; 
-            color: #666; 
-            margin-bottom: 30px; 
-        }
-        .contact-box {
+        .tier {
             background: white;
+            border-radius: 15px;
             padding: 40px;
-            border-radius: 12px;
-            max-width: 600px;
-            margin: 0 auto;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            width: 350px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            position: relative;
+            transition: transform 0.3s;
         }
-        .contact-box h3 {
-            color: #667eea;
+        .tier:hover {
+            transform: translateY(-10px);
+        }
+        .tier.featured {
+            border: 3px solid #667eea;
+            transform: scale(1.05);
+        }
+        .badge {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #667eea;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .tier h3 {
+            font-size: 28px;
+            color: #333;
             margin-bottom: 20px;
-            font-size: 24px;
+            text-align: center;
         }
-        .contact-box p {
-            font-size: 18px;
-            margin-bottom: 30px;
-            line-height: 1.8;
+        .tier .price {
+            font-size: 60px;
+            font-weight: bold;
+            color: #667eea;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .tier ul {
+            list-style: none;
+            padding: 0;
+            margin: 30px 0;
+        }
+        .tier li {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            position: relative;
+            padding-left: 25px;
+        }
+        .tier li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: bold;
+        }
+        .tier .cta-button {
+            display: block;
+            width: 100%;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .cta-button.primary {
+            background: #667eea;
+            color: white;
         }
     </style>
 </head>
@@ -134,94 +88,53 @@
 
 <section class="hero">
     <div>
-        <h1>Turn Your Website Into a Lead Source,<br>Not Just an Online Brochure</h1>
-        <h2>30-Day Google Visibility Kickstart for Local Businesses</h2>
-        <p>We help Google clearly understand what you do, where you operate, and who you're for—so your site attracts local customers actively searching for your services.</p>
+        <h1>Dominate Local Google Search Results</h1>
+        <h2>30-Day Google Visibility Kickstart Packages</h2>
+        <p>Stop being invisible online. Choose the package that matches your growth goals.</p>
         
-        <div class="cta-buttons">
-            <a href="mailto:sretonia@gmail.com?subject=30-Day Google Visibility Kickstart - Order Request&body=Hi, I'd like to order the 30-Day Google Visibility Kickstart for $149.%0A%0AMy details:%0A%0ABusiness Name: %0AEmail: %0ABusiness Type: %0AService I want to rank for: %0AWebsite (if any): %0A%0APlease send me PayPal payment instructions.%0A%0AThank you!" class="cta-button">
-                📧 Email to Order - $149
-            </a>
-            <a href="#details" class="cta-button secondary">Learn More ↓</a>
+        <div class="pricing-tiers">
+            <!-- Boost Tier -->
+            <div class="tier">
+                <h3>Visibility Boost</h3>
+                <div class="price">$359</div>
+                <ul>
+                    <li>3 SEO-optimized blog posts</li>
+                    <li>1 service page rewrite</li>
+                    <li>Google Business Profile setup</li>
+                    <li>Basic keyword research</li>
+                    <li>30-day delivery</li>
+                    <li>Email support</li>
+                </ul>
+                <a href="mailto:sretonia@gmail.com?subject=Visibility Boost Package - $359 Order&body=Hi, I'd like to order the Visibility Boost package for $359.%0A%0AMy details:%0A%0ABusiness Name: %0AEmail: %0ABusiness Type: %0AService I want to rank for: %0AWebsite (if any): %0A%0APlease send me PayPal payment instructions.%0A%0AThank you!" class="cta-button">
+                    📧 Choose Boost Package
+                </a>
+            </div>
+            
+            <!-- Featured Tier -->
+            <div class="tier featured">
+                <div class="badge">MOST POPULAR</div>
+                <h3>Visibility Dominance</h3>
+                <div class="price">$497</div>
+                <ul>
+                    <li><strong>5 SEO-optimized blog posts</strong></li>
+                    <li>1 service page rewrite</li>
+                    <li><strong>Advanced Google Business optimization</strong></li>
+                    <li><strong>Competitor gap analysis</strong></li>
+                    <li><strong>Local citation setup (5 directories)</strong></li>
+                    <li><strong>30-minute strategy call</strong></li>
+                    <li>30-day delivery</li>
+                    <li>Priority email support</li>
+                </ul>
+                <a href="mailto:sretonia@gmail.com?subject=Visibility Dominance Package - $497 Order&body=Hi, I'd like to order the Visibility Dominance package for $497.%0A%0AMy details:%0A%0ABusiness Name: %0AEmail: %0ABusiness Type: %0AService I want to rank for: %0AWebsite (if any): %0A%0APlease send me PayPal payment instructions.%0A%0AThank you!" class="cta-button primary">
+                    🚀 Choose Dominance Package
+                </a>
+            </div>
         </div>
+        
+        <p style="text-align: center; opacity: 0.8; margin-top: 30px;">
+            Both packages include human-written, optimized content. No AI content. 100% satisfaction guarantee.
+        </p>
     </div>
 </section>
 
-<div class="container" id="details">
-    <section class="section">
-        <h2>What You Get in 30 Days</h2>
-        <div class="benefits">
-            <div class="benefit">
-                <h3>🎯 3 SEO-Optimized Blog Posts</h3>
-                <p>Targeted to YOUR service + YOUR location. Written to rank, not just "sound nice". Answers the questions your customers actually search for.</p>
-            </div>
-            <div class="benefit">
-                <h3>📄 1 Service Page Rewrite</h3>
-                <p>Clear, conversion-focused copy structured for local search intent. Turns visitors into leads with strong calls-to-action.</p>
-            </div>
-            <div class="benefit">
-                <h3>📍 Google Business Profile Content</h3>
-                <p>1 optimized GMB post keyword-aligned with your service and location. Helps you show up in local map searches.</p>
-            </div>
-            <div class="benefit">
-                <h3>🔑 Keyword & Intent Targeting</h3>
-                <p>Primary keyword research with supporting long-tail keywords and local modifiers baked in. We find what your customers are actually searching.</p>
-            </div>
-            <div class="benefit">
-                <h3>✅ Human Review & Optimization</h3>
-                <p>No raw AI content. Everything is reviewed, fact-checked, and optimized by a real person. Readable, credible, and publish-ready.</p>
-            </div>
-            <div class="benefit">
-                <h3>📈 Clear Next Steps</h3>
-                <p>We don't just deliver content and disappear. You get clear instructions on what to do next to maximize your Google visibility.</p>
-            </div>
-        </div>
-    </section>
-</div>
-
-<section class="pricing">
-    <h2>Simple, Transparent Pricing</h2>
-    <div class="price">$149</div>
-    <p class="price-note">One-time payment. 30-day delivery. No hidden fees.</p>
-    <a href="mailto:sretonia@gmail.com?subject=30-Day Google Visibility Kickstart - Order Request&body=Hi, I'd like to order the 30-Day Google Visibility Kickstart for $149.%0A%0AMy details:%0A%0ABusiness Name: %0AEmail: %0ABusiness Type: %0AService I want to rank for: %0AWebsite (if any): %0A%0APlease send me PayPal payment instructions.%0A%0AThank you!" class="cta-button">
-        📧 Email to Order Now
-    </a>
-</section>
-
-<div class="container">
-    <section class="section">
-        <div class="contact-box">
-            <h3>Who This Is For</h3>
-            <p><strong>Local service businesses</strong> who depend on customers finding them via Google.</p>
-            <p>Perfect for: Cleaning services, trades (plumbing, electrical, HVAC), dental practices, salons, car detailing, home services, professional services, medical practices, law firms, accounting firms.</p>
-            <p><strong>This is NOT for:</strong> E-commerce stores, national brands, or businesses without a local service area.</p>
-        </div>
-    </section>
-    
-    <section class="section">
-        <div class="contact-box">
-            <h3>What We Promise (and Don't)</h3>
-            <p><strong>❌ We do NOT promise:</strong> Guaranteed rankings or guaranteed leads. No one can promise that honestly.</p>
-            <p><strong>✅ We DO promise:</strong> We help Google clearly understand what you do, where you operate, and who you're for—so your site and Google Business Profile are positioned to attract local search traffic.</p>
-            <p>We give you the foundation. Google does the rest.</p>
-        </div>
-    </section>
-    
-    <section class="section">
-        <div class="contact-box">
-            <h3>Ready to Get Started?</h3>
-            <p><strong>Step 1:</strong> Click the email button above (it opens your email app with a pre-filled template)</p>
-            <p><strong>Step 2:</strong> Fill in your business details</p>
-            <p><strong>Step 3:</strong> Send the email</p>
-            <p><strong>Step 4:</strong> We'll reply within 24 hours with PayPal payment instructions</p>
-            <p><strong>Step 5:</strong> After payment, we start your 30-Day Google Visibility Kickstart</p>
-            <br>
-            <a href="mailto:sretonia@gmail.com?subject=30-Day Google Visibility Kickstart - Order Request&body=Hi, I'd like to order the 30-Day Google Visibility Kickstart for $149.%0A%0AMy details:%0A%0ABusiness Name: %0AEmail: %0ABusiness Type: %0AService I want to rank for: %0AWebsite (if any): %0A%0APlease send me PayPal payment instructions.%0A%0AThank you!" class="cta-button">
-                📧 Email: sretonia@gmail.com
-            </a>
-        </div>
-    </section>
-</div>
-
-</body>
-</html>
+<!-- Rest of your landing page content stays the same -->
