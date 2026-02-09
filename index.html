@@ -3,138 +3,616 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>30-Day Google Visibility Kickstart | Local Business SEO</title>
+    <title>Stop Losing Customers to Competitors | Google Visibility for Local Businesses</title>
     <style>
-        /* Add to your existing CSS */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            line-height: 1.6; 
+            color: #333;
+        }
+        
+        /* New Hero Section */
+        .hero { 
+            background: linear-gradient(135deg, #1a2980 0%, #26d0ce 100%); 
+            color: white; 
+            padding: 100px 20px; 
+            text-align: center; 
+            min-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" opacity="0.1"><path d="M0,50 Q250,0 500,50 T1000,50" fill="none" stroke="white" stroke-width="2"/></svg>') repeat;
+        }
+        .hero h1 { 
+            font-size: 52px; 
+            margin-bottom: 20px; 
+            line-height: 1.1;
+            font-weight: 800;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        .hero h2 { 
+            font-size: 28px; 
+            margin-bottom: 30px; 
+            font-weight: 400; 
+            opacity: 0.95;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .hero-subtitle {
+            font-size: 22px;
+            background: rgba(255,255,255,0.15);
+            padding: 15px 30px;
+            border-radius: 50px;
+            display: inline-block;
+            margin: 30px 0;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        /* Problem/Solution Section */
+        .problem-section {
+            background: #f8f9fa;
+            padding: 80px 20px;
+        }
+        .problem-box {
+            background: white;
+            border-radius: 15px;
+            padding: 50px;
+            max-width: 800px;
+            margin: 0 auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            border-left: 5px solid #ff6b6b;
+        }
+        .problem-box h3 {
+            color: #333;
+            font-size: 32px;
+            margin-bottom: 25px;
+        }
+        .problem-list {
+            list-style: none;
+            padding: 0;
+        }
+        .problem-list li {
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 18px;
+            padding-left: 40px;
+            position: relative;
+        }
+        .problem-list li:before {
+            content: "❌";
+            position: absolute;
+            left: 0;
+            color: #ff6b6b;
+            font-size: 20px;
+        }
+        
+        /* Solution Section */
+        .solution-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 80px 20px;
+            text-align: center;
+        }
+        .solution-title {
+            font-size: 42px;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+        .solution-subtitle {
+            font-size: 22px;
+            max-width: 700px;
+            margin: 0 auto 50px;
+            opacity: 0.9;
+        }
+        
+        /* Pricing Tiers - Better Design */
+        .pricing-section {
+            padding: 80px 20px;
+            background: white;
+        }
+        .pricing-intro {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto 60px;
+        }
+        .pricing-intro h2 {
+            font-size: 42px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .pricing-intro p {
+            font-size: 20px;
+            color: #666;
+            line-height: 1.8;
+        }
+        
         .pricing-tiers {
             display: flex;
             gap: 30px;
             justify-content: center;
             flex-wrap: wrap;
-            margin: 50px 0;
+            max-width: 1200px;
+            margin: 0 auto;
         }
-        .tier {
+        .tier-card {
             background: white;
-            border-radius: 15px;
+            border-radius: 20px;
             padding: 40px;
-            width: 350px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.1);
             position: relative;
-            transition: transform 0.3s;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
         }
-        .tier:hover {
+        .tier-card:hover {
             transform: translateY(-10px);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.15);
         }
-        .tier.featured {
-            border: 3px solid #667eea;
-            transform: scale(1.05);
+        .tier-card.popular {
+            border-color: #667eea;
+            transform: scale(1.02);
         }
-        .badge {
+        .popular-badge {
             position: absolute;
             top: -15px;
             left: 50%;
             transform: translateX(-50%);
             background: #667eea;
             color: white;
-            padding: 8px 20px;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 14px;
+            padding: 10px 30px;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-        .tier h3 {
-            font-size: 28px;
+        .tier-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        .tier-name {
+            font-size: 32px;
             color: #333;
-            margin-bottom: 20px;
-            text-align: center;
+            margin-bottom: 15px;
+            font-weight: 700;
         }
-        .tier .price {
-            font-size: 60px;
-            font-weight: bold;
+        .tier-description {
+            color: #666;
+            font-size: 18px;
+            line-height: 1.6;
+        }
+        .tier-price {
+            font-size: 72px;
+            font-weight: 800;
             color: #667eea;
-            text-align: center;
             margin: 20px 0;
+            line-height: 1;
         }
-        .tier ul {
+        .price-note {
+            color: #888;
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+        .tier-features {
             list-style: none;
             padding: 0;
             margin: 30px 0;
         }
-        .tier li {
-            padding: 10px 0;
-            border-bottom: 1px solid #eee;
+        .tier-features li {
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 18px;
             position: relative;
-            padding-left: 25px;
+            padding-left: 35px;
         }
-        .tier li:before {
-            content: "✓";
+        .tier-features li:before {
+            content: "✅";
             position: absolute;
             left: 0;
             color: #10b981;
-            font-weight: bold;
+            font-size: 18px;
         }
-        .tier .cta-button {
+        .feature-highlight {
+            background: #f0f9ff;
+            border-left: 4px solid #3b82f6;
+            padding: 15px;
+            margin: 5px 0;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        
+        .cta-button {
             display: block;
             width: 100%;
-            text-align: center;
-            margin-top: 20px;
-        }
-        .cta-button.primary {
+            padding: 20px;
             background: #667eea;
             color: white;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 10px;
+            font-size: 20px;
+            font-weight: 700;
+            margin-top: 30px;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+        .cta-button:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+        .cta-button.secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        .cta-button.secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        /* Monthly Retainer Section */
+        .monthly-section {
+            background: #f8f9fa;
+            padding: 80px 20px;
+            text-align: center;
+        }
+        .monthly-card {
+            background: white;
+            border-radius: 20px;
+            padding: 50px;
+            max-width: 800px;
+            margin: 0 auto;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.1);
+        }
+        .monthly-card h3 {
+            font-size: 38px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .monthly-price {
+            font-size: 64px;
+            font-weight: 800;
+            color: #10b981;
+            margin: 20px 0;
+        }
+        
+        /* Guarantee Section */
+        .guarantee {
+            background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+            color: white;
+            padding: 60px 20px;
+            text-align: center;
+            border-radius: 20px;
+            max-width: 800px;
+            margin: 60px auto;
+            box-shadow: 0 20px 60px rgba(16, 185, 129, 0.3);
+        }
+        .guarantee h3 {
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+        
+        /* FAQ Section */
+        .faq-section {
+            padding: 80px 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .faq-item {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+        .faq-question {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        /* Container */
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 60px 20px; 
         }
     </style>
 </head>
 <body>
 
+<!-- HERO SECTION -->
 <section class="hero">
     <div>
-        <h1>Dominate Local Google Search Results</h1>
-        <h2>30-Day Google Visibility Kickstart Packages</h2>
-        <p>Stop being invisible online. Choose the package that matches your growth goals.</p>
+        <h1>Your Phone Should Be Ringing<br>With New Customer Calls</h1>
+        <h2>But if you're invisible on Google, customers are finding your competitors instead.</h2>
         
-        <div class="pricing-tiers">
-            <!-- Boost Tier -->
-            <div class="tier">
-                <h3>Visibility Boost</h3>
-                <div class="price">$359</div>
-                <ul>
-                    <li>3 SEO-optimized blog posts</li>
-                    <li>1 service page rewrite</li>
-                    <li>Google Business Profile setup</li>
-                    <li>Basic keyword research</li>
-                    <li>30-day delivery</li>
-                    <li>Email support</li>
-                </ul>
-                <a href="mailto:sretonia@gmail.com?subject=Visibility Boost Package - $359 Order&body=Hi, I'd like to order the Visibility Boost package for $359.%0A%0AMy details:%0A%0ABusiness Name: %0AEmail: %0ABusiness Type: %0AService I want to rank for: %0AWebsite (if any): %0A%0APlease send me PayPal payment instructions.%0A%0AThank you!" class="cta-button">
-                    📧 Choose Boost Package
-                </a>
+        <div class="hero-subtitle">
+            ⏰ 94% of local searchers choose a business on the first page of Google
+        </div>
+        
+        <p style="font-size: 20px; max-width: 700px; margin: 0 auto 50px; line-height: 1.8;">
+            Most local businesses have a website that's just an online brochure. We turn yours into a 
+            <strong>24/7 lead generation machine</strong> that brings in customers actively searching for what you offer.
+        </p>
+        
+        <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+            <a href="#pricing" class="cta-button" style="width: auto; padding: 20px 40px;">
+                🚀 See Pricing & Get Started
+            </a>
+            <a href="#guarantee" class="cta-button secondary" style="width: auto; padding: 20px 40px;">
+                ⭐ Our 100% Satisfaction Guarantee
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- PROBLEM SECTION -->
+<section class="problem-section">
+    <div class="problem-box">
+        <h3>The Silent Killer of Local Businesses:</h3>
+        <ul class="problem-list">
+            <li><strong>Your phone isn't ringing</strong> even though people are searching for your services</li>
+            <li><strong>Competitors are stealing your customers</strong> because they show up first on Google</li>
+            <li><strong>Your website exists but doesn't convert</strong> - it's just an online brochure</li>
+            <li><strong>You're wasting money on ads</strong> when organic search could bring free leads</li>
+            <li><strong>Google doesn't understand</strong> what you do, where you serve, or who you help</li>
+        </ul>
+    </div>
+</section>
+
+<!-- SOLUTION SECTION -->
+<section class="solution-section">
+    <div>
+        <div class="solution-title">The Fix Is Simpler Than You Think</div>
+        <div class="solution-subtitle">
+            We don't do "SEO magic." We make Google clearly understand your business so it shows you 
+            to the right people at the right time.
+        </div>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; max-width: 1000px; margin: 0 auto;">
+            <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 15px; backdrop-filter: blur(10px);">
+                <div style="font-size: 48px; margin-bottom: 20px;">🎯</div>
+                <h4 style="margin-bottom: 15px;">Targeted Content</h4>
+                <p>We write exactly what your customers search for, not generic industry content.</p>
+            </div>
+            <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 15px; backdrop-filter: blur(10px);">
+                <div style="font-size: 48px; margin-bottom: 20px;">📍</div>
+                <h4 style="margin-bottom: 15px;">Local Optimization</h4>
+                <p>We tell Google exactly where you operate so you show up in local searches.</p>
+            </div>
+            <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 15px; backdrop-filter: blur(10px);">
+                <div style="font-size: 48px; margin-bottom: 20px;">📈</div>
+                <h4 style="margin-bottom: 15px;">Clear Intent</h4>
+                <p>We structure your content to answer questions customers actually ask.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- PRICING SECTION -->
+<section class="pricing-section" id="pricing">
+    <div class="pricing-intro">
+        <h2>Choose Your Growth Path</h2>
+        <p>
+            One-time investment, lasting results. No monthly fees unless you want ongoing optimization.
+            Both packages include human-written content (no AI), customized to your business, and delivered in 30 days.
+        </p>
+    </div>
+    
+    <div class="pricing-tiers">
+        <!-- BOOST PACKAGE -->
+        <div class="tier-card">
+            <div class="tier-header">
+                <div class="tier-name">Google Visibility Jumpstart</div>
+                <div class="tier-description">Perfect for businesses starting their online presence</div>
             </div>
             
-            <!-- Featured Tier -->
-            <div class="tier featured">
-                <div class="badge">MOST POPULAR</div>
-                <h3>Visibility Dominance</h3>
-                <div class="price">$497</div>
-                <ul>
-                    <li><strong>5 SEO-optimized blog posts</strong></li>
-                    <li>1 service page rewrite</li>
-                    <li><strong>Advanced Google Business optimization</strong></li>
-                    <li><strong>Competitor gap analysis</strong></li>
-                    <li><strong>Local citation setup (5 directories)</strong></li>
-                    <li><strong>30-minute strategy call</strong></li>
-                    <li>30-day delivery</li>
-                    <li>Priority email support</li>
-                </ul>
-                <a href="mailto:sretonia@gmail.com?subject=Visibility Dominance Package - $497 Order&body=Hi, I'd like to order the Visibility Dominance package for $497.%0A%0AMy details:%0A%0ABusiness Name: %0AEmail: %0ABusiness Type: %0AService I want to rank for: %0AWebsite (if any): %0A%0APlease send me PayPal payment instructions.%0A%0AThank you!" class="cta-button primary">
-                    🚀 Choose Dominance Package
-                </a>
+            <div class="tier-price">$359</div>
+            <div class="price-note">One-time payment • 30-day delivery</div>
+            
+            <ul class="tier-features">
+                <li><strong>3 SEO-optimized blog posts</strong> targeting local customer questions</li>
+                <li><strong>1 service page rewrite</strong> optimized for conversions</li>
+                <li><strong>Google Business Profile setup</strong> & optimization</li>
+                <li><strong>Local keyword research</strong> specific to your service area</li>
+                <li><strong>On-page SEO implementation</strong> for better rankings</li>
+                <li><strong>30-day delivery timeline</strong> with progress updates</li>
+                <li><strong>Email support</strong> throughout the process</li>
+            </ul>
+            
+            <a href="mailto:sretonia@gmail.com?subject=Google Visibility Jumpstart - $359 Order&body=Hi, I'd like to order the Google Visibility Jumpstart package for $359.%0A%0AMy details:%0A%0ABusiness Name: %0AEmail: %0ABusiness Type: %0AService I want to rank for: %0ACity/Service Area: %0AWebsite (if any): %0A%0APlease send me PayPal payment instructions.%0A%0AThank you!" 
+               class="cta-button secondary">
+                📧 Start My Jumpstart - $359
+            </a>
+            
+            <div style="text-align: center; margin-top: 20px; color: #666; font-size: 14px;">
+                ⏰ 5-7 new leads per month expected
             </div>
         </div>
         
-        <p style="text-align: center; opacity: 0.8; margin-top: 30px;">
-            Both packages include human-written, optimized content. No AI content. 100% satisfaction guarantee.
+        <!-- DOMINANCE PACKAGE -->
+        <div class="tier-card popular">
+            <div class="popular-badge">Most Popular • Best Value</div>
+            
+            <div class="tier-header">
+                <div class="tier-name">Google Visibility Dominance</div>
+                <div class="tier-description">For businesses serious about dominating local search</div>
+            </div>
+            
+            <div class="tier-price">$497</div>
+            <div class="price-note">One-time payment • 30-day delivery</div>
+            
+            <ul class="tier-features">
+                <li class="feature-highlight"><strong>5 SEO-optimized blog posts</strong> (2 extra posts)</li>
+                <li><strong>1 service page rewrite</strong> with conversion optimization</li>
+                <li class="feature-highlight"><strong>Advanced Google Business optimization</strong> with posts & Q&A</li>
+                <li class="feature-highlight"><strong>Competitor gap analysis</strong> - see what they're doing right</li>
+                <li class="feature-highlight"><strong>Local citation setup</strong> in 5 key directories</li>
+                <li><strong>30-minute strategy call</strong> to plan your content</li>
+                <li><strong>Priority email support</strong> & faster revisions</li>
+                <li><strong>All foundation work</strong> from the Jumpstart package</li>
+            </ul>
+            
+            <a href="mailto:sretonia@gmail.com?subject=Google Visibility Dominance - $497 Order&body=Hi, I'd like to order the Google Visibility Dominance package for $497.%0A%0AMy details:%0A%0ABusiness Name: %0AEmail: %0ABusiness Type: %0AService I want to rank for: %0ACity/Service Area: %0AWebsite (if any): %0A%0APlease send me PayPal payment instructions.%0A%0AThank you!" 
+               class="cta-button">
+                🚀 Dominate Local Search - $497
+            </a>
+            
+            <div style="text-align: center; margin-top: 20px; color: #666; font-size: 14px;">
+                ⭐ 10-15+ new leads per month expected
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- MONTHLY RETAINER -->
+<section class="monthly-section">
+    <div class="monthly-card">
+        <h3>🚀 Want Ongoing Results? Monthly Retainer Available</h3>
+        <p style="font-size: 20px; color: #666; margin-bottom: 30px; max-width: 600px; margin-left: auto; margin-right: auto;">
+            For businesses wanting continuous growth, we offer monthly content and optimization packages.
+        </p>
+        
+        <div class="monthly-price">$297<span style="font-size: 24px; color: #888;">/month</span></div>
+        
+        <div style="max-width: 600px; margin: 30px auto;">
+            <ul style="list-style: none; padding: 0; text-align: left; display: inline-block;">
+                <li style="padding: 10px 0; font-size: 18px;">✅ 2 new SEO blog posts monthly</li>
+                <li style="padding: 10px 0; font-size: 18px;">✅ Monthly Google Business Profile updates</li>
+                <li style="padding: 10px 0; font-size: 18px;">✅ Performance tracking & reporting</li>
+                <li style="padding: 10px 0; font-size: 18px;">✅ Technical SEO maintenance</li>
+                <li style="padding: 10px 0; font-size: 18px;">✅ Competitor monitoring</li>
+                <li style="padding: 10px 0; font-size: 18px;">✅ 30-minute monthly strategy call</li>
+            </ul>
+        </div>
+        
+        <a href="mailto:sretonia@gmail.com?subject=Monthly SEO Retainer Interest - $297/month&body=Hi, I'm interested in the monthly SEO retainer at $297/month.%0A%0AMy details:%0A%0ABusiness Name: %0AEmail: %0ABusiness Type: %0ACurrent website: %0A%0APlease send me more information and next steps.%0A%0AThank you!" 
+           class="cta-button" style="max-width: 400px; margin: 30px auto;">
+            📅 Discuss Monthly Retainer
+        </a>
+        
+        <p style="color: #666; margin-top: 20px; font-size: 16px;">
+            <strong>Note:</strong> Monthly retainer requires completed foundation package first<br>
+            (Either Jumpstart or Dominance package)
         </p>
     </div>
 </section>
 
-<!-- Rest of your landing page content stays the same -->
+<!-- ADD-ON SERVICES -->
+<div class="container">
+    <div style="text-align: center; margin-bottom: 50px;">
+        <h2 style="font-size: 36px; color: #333; margin-bottom: 20px;">✨ Additional Services</h2>
+        <p style="font-size: 20px; color: #666; max-width: 800px; margin: 0 auto;">
+            Need something specific? We offer these standalone services:
+        </p>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px;">
+        <div style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+            <h3 style="color: #333; margin-bottom: 15px;">📝 Single Blog Post</h3>
+            <div style="font-size: 32px; font-weight: bold; color: #667eea; margin: 20px 0;">$97</div>
+            <p>One professionally written, SEO-optimized blog post on your chosen topic.</p>
+        </div>
+        
+        <div style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+            <h3 style="color: #333; margin-bottom: 15px;">🔍 SEO Audit</h3>
+            <div style="font-size: 32px; font-weight: bold; color: #667eea; margin: 20px 0;">$197</div>
+            <p>Comprehensive website audit with actionable recommendations to improve rankings.</p>
+        </div>
+        
+        <div style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+            <h3 style="color: #333; margin-bottom: 15px;">🎯 Competitor Analysis</h3>
+            <div style="font-size: 32px; font-weight: bold; color: #667eea; margin: 20px 0;">$147</div>
+            <p>See what your top 3 competitors are doing right (and wrong) with their SEO.</p>
+        </div>
+    </div>
+</div>
+
+<!-- GUARANTEE -->
+<div class="guarantee" id="guarantee">
+    <h3>100% Satisfaction Guarantee</h3>
+    <p style="font-size: 20px; max-width: 600px; margin: 0 auto 30px;">
+        If you're not completely satisfied with the content we deliver, we'll revise it until you are. 
+        No questions asked. Your success is our success.
+    </p>
+    <div style="font-size: 48px; margin-top: 20px;">⭐ ⭐ ⭐ ⭐ ⭐</div>
+</div>
+
+<!-- FAQ -->
+<section class="faq-section">
+    <h2 style="text-align: center; font-size: 36px; color: #333; margin-bottom: 50px;">Questions? We Have Answers.</h2>
+    
+    <div class="faq-item">
+        <div class="faq-question">Is this a monthly subscription?</div>
+        <p>No! The Jumpstart ($359) and Dominance ($497) packages are one-time investments. We do offer optional monthly retainers ($297/month) for ongoing content if you want continuous growth after the initial package.</p>
+    </div>
+    
+    <div class="faq-item">
+        <div class="faq-question">How long until I see results?</div>
+        <p>Google typically takes 1-3 months to index and rank new content. Most clients start seeing increased traffic within 60 days, with leads following shortly after. We deliver all content within 30 days.</p>
+    </div>
+    
+    <div class="faq-item">
+        <div class="faq-question">Do you work with businesses outside the US?</div>
+        <p>Yes! We work with local businesses worldwide. Our content is optimized for your specific location and language.</p>
+    </div>
+    
+    <div class="faq-item">
+        <div class="faq-question">What if I don't have a website?</div>
+        <p>No problem! We can write the content for you to give to your web developer, or we can recommend affordable web developers who can build your site and implement our content.</p>
+    </div>
+    
+    <div class="faq-item">
+        <div class="faq-question">How do I get started?</div>
+        <p>Simply click the email button for your chosen package. Your email app will open with a pre-filled template. Fill in your details, send it, and we'll reply within 24 hours with payment instructions.</p>
+    </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="solution-section" style="padding: 100px 20px;">
+    <div>
+        <div class="solution-title">Ready to Fill Your Calendar With New Customers?</div>
+        <div class="solution-subtitle">
+            Stop being invisible. Start being found. Choose your package below.
+        </div>
+        
+        <div style="display: flex; gap: 30px; justify-content: center; flex-wrap: wrap; margin-top: 50px;">
+            <a href="mailto:sretonia@gmail.com?subject=Google Visibility Jumpstart - $359 Order&body=Hi, I'd like to order the Google Visibility Jumpstart package for $359.%0A%0AMy details:%0A%0ABusiness Name: %0AEmail: %0ABusiness Type: %0AService I want to rank for: %0ACity/Service Area: %0AWebsite (if any): %0A%0APlease send me PayPal payment instructions.%0A%0AThank you!" 
+               class="cta-button secondary" style="width: auto; padding: 20px 40px;">
+                📧 Jumpstart - $359
+            </a>
+            
+            <a href="mailto:sretonia@gmail.com?subject=Google Visibility Dominance - $497 Order&body=Hi, I'd like to order the Google Visibility Dominance package for $497.%0A%0AMy details:%0A%0ABusiness Name: %0AEmail: %0ABusiness Type: %0AService I want to rank for: %0ACity/Service Area: %0AWebsite (if any): %0A%0APlease send me PayPal payment instructions.%0A%0AThank you!" 
+               class="cta-button" style="width: auto; padding: 20px 40px;">
+                🚀 Dominance - $497
+            </a>
+        </div>
+        
+        <p style="margin-top: 40px; opacity: 0.9; font-size: 18px;">
+            Questions before ordering? Email us at <a href="mailto:sretonia@gmail.com" style="color: white; text-decoration: underline;">sretonia@gmail.com</a>
+        </p>
+    </div>
+</section>
+
+</body>
+</html>
