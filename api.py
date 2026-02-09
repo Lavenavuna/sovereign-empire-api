@@ -8,7 +8,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from datetime import datetime
 from typing import Optional
-import uuid
 
 app = FastAPI(title="Sovereign Empire API")
 
@@ -502,9 +501,6 @@ async def admin_dashboard():
     """
     
     return HTMLResponse(content=html_content)
-
-# Swagger/OpenAPI docs at /docs
-# Already provided by FastAPI
 
 if __name__ == "__main__":
     import uvicorn
