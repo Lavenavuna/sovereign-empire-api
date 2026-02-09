@@ -1,5 +1,5 @@
 """
-Sovereign Empire API - Complete Working Version with Revenue Tracking
+Sovereign Empire API - Complete Working Version with Dual Pricing Tiers
 """
 
 from fastapi import FastAPI, HTTPException
@@ -19,7 +19,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# DATABASE WITH REVENUE TRACKING
+# DATABASE WITH DUAL PRICING TIERS
 orders_db = [
     {
         "order_id": "ORD-0001",
@@ -29,8 +29,9 @@ orders_db = [
         "topic": "Dental SEO",
         "wordpress_url": "https://johnsdental.com",
         "tenant_id": "DIRECT_CUSTOMER",
+        "package_type": "dominance",
         "status": "completed",
-        "price": 149.00,
+        "price": 497.00,
         "paid": True,
         "created_at": "2024-01-01T10:00:00"
     },
@@ -42,8 +43,9 @@ orders_db = [
         "topic": "Local Plumbing SEO",
         "wordpress_url": "https://sarahsplumbing.com",
         "tenant_id": "DIRECT_CUSTOMER",
+        "package_type": "dominance",
         "status": "in_progress",
-        "price": 149.00,
+        "price": 497.00,
         "paid": True,
         "created_at": "2024-01-02T11:30:00"
     },
@@ -55,8 +57,9 @@ orders_db = [
         "topic": "Legal Services Marketing",
         "wordpress_url": "https://wilsonlaw.com",
         "tenant_id": "DIRECT_CUSTOMER",
+        "package_type": "boost",
         "status": "pending",
-        "price": 149.00,
+        "price": 359.00,
         "paid": False,
         "created_at": "2024-01-03T14:45:00"
     },
@@ -68,8 +71,9 @@ orders_db = [
         "topic": "HVAC Local SEO",
         "wordpress_url": "https://davishvac.com",
         "tenant_id": "DIRECT_CUSTOMER",
+        "package_type": "dominance",
         "status": "completed",
-        "price": 149.00,
+        "price": 497.00,
         "paid": True,
         "created_at": "2024-01-04T09:15:00"
     },
@@ -81,8 +85,9 @@ orders_db = [
         "topic": "Auto Detailing Marketing",
         "wordpress_url": "https://browndetailing.com",
         "tenant_id": "DIRECT_CUSTOMER",
+        "package_type": "boost",
         "status": "pending",
-        "price": 149.00,
+        "price": 359.00,
         "paid": False,
         "created_at": "2024-01-05T16:20:00"
     },
@@ -94,8 +99,9 @@ orders_db = [
         "topic": "Residential Cleaning SEO",
         "wordpress_url": "https://taylorcleaning.com",
         "tenant_id": "DIRECT_CUSTOMER",
+        "package_type": "dominance",
         "status": "in_progress",
-        "price": 149.00,
+        "price": 497.00,
         "paid": True,
         "created_at": "2024-01-06T13:10:00"
     }
@@ -109,24 +115,34 @@ class OrderCreate(BaseModel):
     topic: str
     wordpress_url: Optional[str] = ""
     tenant_id: str
-    price: float = 149.00
+    package_type: str = "dominance"  # "boost" or "dominance"
+    price: float = 497.00  # Default to higher package
     paid: bool = False
 
 class OrderUpdate(BaseModel):
     status: Optional[str] = None
     price: Optional[float] = None
     paid: Optional[bool] = None
+    package_type: Optional[str] = None
 
 # Root endpoint
 @app.get("/")
 async def root():
+    total_revenue = sum(order["price"] for order in orders_db if order.get("paid") == True)
+    boost_count = sum(1 for order in orders_db if order.get("package_type") == "boost")
+    dominance_count = sum(1 for order in orders_db if order.get("package_type") == "dominance")
+    
     return {
         "service": "Sovereign Empire API",
         "status": "online",
-        "version": "2.0.0",
-        "features": ["order_management", "revenue_tracking", "admin_dashboard"],
+        "version": "2.1.0",
+        "features": ["dual_pricing", "order_management", "revenue_tracking", "admin_dashboard"],
         "orders_count": len(orders_db),
-        "total_revenue": sum(order["price"] for order in orders_db if order.get("paid") == True)
+        "package_stats": {
+            "boost": boost_count,
+            "dominance": dominance_count
+        },
+        "total_revenue": total_revenue
     }
 
 # Health check
@@ -134,6 +150,8 @@ async def root():
 async def health_check():
     paid_orders = sum(1 for order in orders_db if order.get("paid") == True)
     total_revenue = sum(order["price"] for order in orders_db if order.get("paid") == True)
+    boost_revenue = sum(order["price"] for order in orders_db if order.get("package_type") == "boost" and order.get("paid") == True)
+    dominance_revenue = sum(order["price"] for order in orders_db if order.get("package_type") == "dominance" and order.get("paid") == True)
     
     return {
         "status": "healthy",
@@ -146,6 +164,8 @@ async def health_check():
         },
         "revenue": {
             "total": total_revenue,
+            "boost_package": boost_revenue,
+            "dominance_package": dominance_revenue,
             "average_order": total_revenue / paid_orders if paid_orders > 0 else 0
         }
     }
@@ -154,6 +174,14 @@ async def health_check():
 @app.post("/api/orders/create")
 async def create_order(order: OrderCreate):
     try:
+        # Set price based on package type
+        if order.package_type == "boost":
+            price = 359.00
+        elif order.package_type == "dominance":
+            price = 497.00
+        else:
+            price = order.price  # Fallback to provided price
+        
         order_id = f"ORD-{len(orders_db) + 1:04d}"
         new_order = {
             "order_id": order_id,
@@ -163,8 +191,9 @@ async def create_order(order: OrderCreate):
             "topic": order.topic,
             "wordpress_url": order.wordpress_url,
             "tenant_id": order.tenant_id,
+            "package_type": order.package_type,
             "status": "pending",
-            "price": order.price,
+            "price": price,
             "paid": order.paid,
             "created_at": datetime.now().isoformat()
         }
@@ -186,7 +215,7 @@ async def get_order(order_id: str):
             return order
     raise HTTPException(status_code=404, detail="Order not found")
 
-# Update order (status, price, paid status)
+# Update order (status, price, paid status, package)
 @app.put("/api/orders/{order_id}")
 async def update_order(order_id: str, update: OrderUpdate):
     for order in orders_db:
@@ -197,6 +226,13 @@ async def update_order(order_id: str, update: OrderUpdate):
                 order["price"] = update.price
             if update.paid is not None:
                 order["paid"] = update.paid
+            if update.package_type:
+                order["package_type"] = update.package_type
+                # Auto-update price based on package
+                if update.package_type == "boost":
+                    order["price"] = 359.00
+                elif update.package_type == "dominance":
+                    order["price"] = 497.00
             return order
     raise HTTPException(status_code=404, detail="Order not found")
 
@@ -212,7 +248,7 @@ async def delete_order(order_id: str):
     
     return {"message": "Order deleted successfully"}
 
-# ADMIN DASHBOARD WITH REVENUE TRACKING
+# ADMIN DASHBOARD WITH DUAL PRICING
 @app.get("/admin/dashboard")
 async def admin_dashboard():
     # Calculate revenue stats
@@ -221,6 +257,12 @@ async def admin_dashboard():
     
     total_revenue = sum(order["price"] for order in paid_orders)
     pending_revenue = sum(order["price"] for order in pending_payment)
+    
+    # Package statistics
+    boost_orders = [o for o in orders_db if o.get("package_type") == "boost"]
+    dominance_orders = [o for o in orders_db if o.get("package_type") == "dominance"]
+    boost_revenue = sum(order["price"] for order in boost_orders if order.get("paid") == True)
+    dominance_revenue = sum(order["price"] for order in dominance_orders if order.get("paid") == True)
     
     status_counts = {}
     for order in orders_db:
@@ -291,6 +333,25 @@ async def admin_dashboard():
                 color: #10b981;
                 margin: 10px 0;
             }}
+            .package-stats {{
+                display: flex;
+                justify-content: space-around;
+                background: white;
+                padding: 20px;
+                border-radius: 8px;
+                margin: 20px 0;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            }}
+            .package-stat {{
+                text-align: center;
+            }}
+            .package-label {{
+                font-size: 1.2em;
+                font-weight: bold;
+                margin-bottom: 10px;
+            }}
+            .boost {{ color: #3b82f6; }}
+            .dominance {{ color: #8b5cf6; }}
             .orders-table {{
                 background: white;
                 border-radius: 8px;
@@ -334,6 +395,14 @@ async def admin_dashboard():
             }}
             .payment-paid {{ background: #d4edda; color: #155724; }}
             .payment-unpaid {{ background: #f8d7da; color: #721c24; }}
+            .package-badge {{
+                padding: 5px 15px;
+                border-radius: 20px;
+                font-size: 0.85em;
+                font-weight: 600;
+            }}
+            .package-boost {{ background: #dbeafe; color: #1e40af; }}
+            .package-dominance {{ background: #ede9fe; color: #5b21b6; }}
             .price-cell {{
                 font-weight: bold;
                 color: #10b981;
@@ -357,8 +426,8 @@ async def admin_dashboard():
     <body>
         <div class="container">
             <header>
-                <h1>📊 Orders Dashboard with Revenue Tracking</h1>
-                <p>Manage orders, track payments, and monitor revenue</p>
+                <h1>📊 Orders Dashboard - Dual Pricing Tiers</h1>
+                <p>Manage orders, track payments, and monitor revenue across both packages</p>
             </header>
             
             <div class="stats">
@@ -385,6 +454,21 @@ async def admin_dashboard():
                 </div>
             </div>
             
+            <div class="package-stats">
+                <div class="package-stat">
+                    <div class="package-label boost">🚀 Boost Package</div>
+                    <div style="font-size: 2em; font-weight: bold; color: #3b82f6;">${boost_revenue:,.2f}</div>
+                    <div>{len([o for o in boost_orders if o.get('paid') == True])} paid orders</div>
+                    <div>{len(boost_orders)} total</div>
+                </div>
+                <div class="package-stat">
+                    <div class="package-label dominance">🔥 Dominance Package</div>
+                    <div style="font-size: 2em; font-weight: bold; color: #8b5cf6;">${dominance_revenue:,.2f}</div>
+                    <div>{len([o for o in dominance_orders if o.get('paid') == True])} paid orders</div>
+                    <div>{len(dominance_orders)} total</div>
+                </div>
+            </div>
+            
             <div class="orders-table">
                 <table>
                     <thead>
@@ -392,6 +476,7 @@ async def admin_dashboard():
                             <th>Order ID</th>
                             <th>Customer</th>
                             <th>Email</th>
+                            <th>Package</th>
                             <th>Industry</th>
                             <th>Topic</th>
                             <th>Status</th>
@@ -409,12 +494,15 @@ async def admin_dashboard():
         status_class = f"status-{order['status']}"
         payment_class = f"payment-{'paid' if order['paid'] else 'unpaid'}"
         payment_text = "Paid ✅" if order['paid'] else "Unpaid ❌"
+        package_class = f"package-{order.get('package_type', 'dominance')}"
+        package_display = "🚀 Boost" if order.get('package_type') == 'boost' else '🔥 Dominance'
         
         html_content += f"""
                         <tr>
                             <td><strong>{order['order_id']}</strong></td>
                             <td>{order['customer_name']}</td>
                             <td>{order['customer_email']}</td>
+                            <td><span class="package-badge {package_class}">{package_display}</span></td>
                             <td>{order['industry']}</td>
                             <td>{order['topic']}</td>
                             <td><span class="status-badge {status_class}">{order['status']}</span></td>
@@ -443,12 +531,14 @@ async def admin_dashboard():
             
             function editOrder(orderId) {
                 const newStatus = prompt('Enter new status (pending/in_progress/completed):', 'pending');
-                const newPrice = prompt('Enter new price (e.g., 149.00):', '149.00');
+                const newPackage = prompt('Enter package type (boost/dominance):', 'dominance');
+                const newPrice = prompt('Enter new price (e.g., 359.00 or 497.00):', '497.00');
                 const newPaid = confirm('Is this order paid? (OK for Yes, Cancel for No)');
                 
-                if (newStatus || newPrice) {
+                if (newStatus || newPackage || newPrice) {
                     const updateData = {};
                     if (newStatus) updateData.status = newStatus;
+                    if (newPackage) updateData.package_type = newPackage;
                     if (newPrice) updateData.price = parseFloat(newPrice);
                     updateData.paid = newPaid;
                     
