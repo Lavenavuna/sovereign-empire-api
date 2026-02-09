@@ -50,18 +50,11 @@ orders_db = [
         "created_at": "2024-01-02T11:30:00"
     },
     {
-        "order_id": "ORD-0003",
-        "customer_name": "Mike Wilson",
-        "customer_email": "mike@example.com",
-        "industry": "Law Firm",
-        "topic": "Legal Services Marketing",
-        "wordpress_url": "https://wilsonlaw.com",
-        "tenant_id": "DIRECT_CUSTOMER",
-        "package_type": "boost",
-        "status": "pending",
-        "price": 359.00,
-        "paid": False,
-        "created_at": "2024-01-03T14:45:00"
+        # Line ~55:
+    "paid": True,  # Changed from False
+
+# Line ~75:
+    "paid": True,  # Changed from False
     },
     {
         "order_id": "ORD-0004",
