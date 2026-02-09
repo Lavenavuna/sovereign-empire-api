@@ -4,37 +4,27 @@ __pycache__/
 *$py.class
 *.so
 .Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-
-# Virtual environments
-venv/
 env/
+venv/
 ENV/
-.venv/
+env.bak/
+venv.bak/
 
-# Environment files - NEVER commit these!
+# Environment
 .env
 .env.local
-.env.production
+.env.development.local
+.env.test.local
+.env.production.local
 
-# Database files (local dev only)
-*.db
-*.sqlite
-*.sqlite3
+# Orders (generated content)
+generated_orders/
+premium_delivery_*/
+orders/
+
+# API keys
+secrets.txt
+api_keys.txt
 
 # IDE
 .vscode/
@@ -42,29 +32,3 @@ ENV/
 *.swp
 *.swo
 *~
-
-# OS
-.DS_Store
-Thumbs.db
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-
-# Logs
-*.log
-logs/
-
-# Testing
-.coverage
-htmlcov/
-.pytest_cache/
-.tox/
-
-# Jupyter Notebook
-.ipynb_checkpoints
-
-# mypy
-.mypy_cache/
-.dmypy.json
-dmypy.json
