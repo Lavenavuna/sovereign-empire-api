@@ -1,294 +1,224 @@
 """
-Sovereign Empire API - Clean Working Version
-Minimal, reliable API for order management
+Sovereign Empire API - Ultra Simple Working Version
+No database dependencies, no external services
 """
 
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, EmailStr
-from sqlalchemy import create_engine, Column, String, Float, DateTime, Integer
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, Session
+from pydantic import BaseModel
 from datetime import datetime
-from typing import Optional, List
-import os
+from typing import Optional
 import uuid
 
-# ============================================================================
-# DATABASE SETUP
-# ============================================================================
+app = FastAPI(title="Sovereign Empire API")
 
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./orders.db")
-
-# Fix for Railway PostgreSQL URL
-if DATABASE_URL.startswith("postgres://"):
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
-
-engine = create_engine(DATABASE_URL)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base = declarative_base()
-
-
-# ============================================================================
-# DATABASE MODELS
-# ============================================================================
-
-class Order(Base):
-    __tablename__ = "orders"
-    
-    id = Column(Integer, primary_key=True, index=True)
-    order_id = Column(String, unique=True, index=True)
-    customer_name = Column(String)
-    customer_email = Column(String)
-    industry = Column(String, nullable=True)
-    topic = Column(String)
-    wordpress_url = Column(String, nullable=True)
-    tenant_id = Column(String, default="DIRECT_CUSTOMER")
-    status = Column(String, default="PENDING")
-    cost = Column(Float, default=0.0)
-    created_at = Column(DateTime, default=datetime.utcnow)
-
-
-# Create tables
-Base.metadata.create_all(bind=engine)
-
-
-# ============================================================================
-# PYDANTIC MODELS
-# ============================================================================
-
-class OrderCreate(BaseModel):
-    customer_name: str
-    customer_email: EmailStr
-    industry: Optional[str] = None
-    topic: str
-    wordpress_url: Optional[str] = None
-    tenant_id: str = "DIRECT_CUSTOMER"
-
-
-class OrderResponse(BaseModel):
-    order_id: str
-    customer_name: str
-    customer_email: str
-    industry: Optional[str]
-    topic: str
-    wordpress_url: Optional[str]
-    tenant_id: str
-    status: str
-    cost: float
-    created_at: datetime
-    
-    class Config:
-        from_attributes = True
-
-
-# ============================================================================
-# FASTAPI APP
-# ============================================================================
-
-app = FastAPI(
-    title="Sovereign Empire API",
-    description="Content Generation Management System",
-    version="2.0.0"
-)
-
-# CORS middleware
+# Enable CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# SIMPLE IN-MEMORY DATABASE (no external DB needed)
+orders_db = [
+    {
+        "order_id": "ORD-0001",
+        "customer_name": "John Smith",
+        "customer_email": "john@example.com",
+        "industry": "Dental Practice",
+        "topic": "Dental SEO",
+        "wordpress_url": "https://johnsdental.com",
+        "tenant_id": "DIRECT_CUSTOMER",
+        "status": "completed",
+        "created_at": "2024-01-01T10:00:00"
+    },
+    {
+        "order_id": "ORD-0002",
+        "customer_name": "Sarah Johnson",
+        "customer_email": "sarah@example.com",
+        "industry": "Plumbing",
+        "topic": "Local Plumbing SEO",
+        "wordpress_url": "https://sarahsplumbing.com",
+        "tenant_id": "DIRECT_CUSTOMER",
+        "status": "in_progress",
+        "created_at": "2024-01-02T11:30:00"
+    },
+    {
+        "order_id": "ORD-0003",
+        "customer_name": "Mike Wilson",
+        "customer_email": "mike@example.com",
+        "industry": "Law Firm",
+        "topic": "Legal Services Marketing",
+        "wordpress_url": "https://wilsonlaw.com",
+        "tenant_id": "DIRECT_CUSTOMER",
+        "status": "pending",
+        "created_at": "2024-01-03T14:45:00"
+    },
+    {
+        "order_id": "ORD-0004",
+        "customer_name": "Emma Davis",
+        "customer_email": "emma@example.com",
+        "industry": "HVAC Services",
+        "topic": "HVAC Local SEO",
+        "wordpress_url": "https://davishvac.com",
+        "tenant_id": "DIRECT_CUSTOMER",
+        "status": "completed",
+        "created_at": "2024-01-04T09:15:00"
+    },
+    {
+        "order_id": "ORD-0005",
+        "customer_name": "Robert Brown",
+        "customer_email": "robert@example.com",
+        "industry": "Car Detailing",
+        "topic": "Auto Detailing Marketing",
+        "wordpress_url": "https://browndetailing.com",
+        "tenant_id": "DIRECT_CUSTOMER",
+        "status": "pending",
+        "created_at": "2024-01-05T16:20:00"
+    },
+    {
+        "order_id": "ORD-0006",
+        "customer_name": "Lisa Taylor",
+        "customer_email": "lisa@example.com",
+        "industry": "Cleaning Services",
+        "topic": "Residential Cleaning SEO",
+        "wordpress_url": "https://taylorcleaning.com",
+        "tenant_id": "DIRECT_CUSTOMER",
+        "status": "in_progress",
+        "created_at": "2024-01-06T13:10:00"
+    }
+]
 
-# ============================================================================
-# DATABASE DEPENDENCY
-# ============================================================================
+# Pydantic models
+class OrderCreate(BaseModel):
+    customer_name: str
+    customer_email: str
+    industry: str
+    topic: str
+    wordpress_url: Optional[str] = ""
+    tenant_id: str
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+class OrderUpdate(BaseModel):
+    status: Optional[str] = None
 
-
-# ============================================================================
-# ROUTES
-# ============================================================================
-
-@app.get("/", response_class=HTMLResponse)
+# Root endpoint
+@app.get("/")
 async def root():
-    """Root endpoint"""
-    return """
-    <html>
-        <head>
-            <title>Sovereign Empire API</title>
-            <style>
-                body { font-family: Arial; text-align: center; padding: 50px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
-                h1 { font-size: 48px; margin-bottom: 20px; }
-                a { color: white; text-decoration: none; background: rgba(255,255,255,0.2); padding: 15px 30px; border-radius: 8px; display: inline-block; margin: 10px; }
-                a:hover { background: rgba(255,255,255,0.3); }
-            </style>
-        </head>
-        <body>
-            <h1>🏛️ Sovereign Empire API</h1>
-            <p>Content Generation Management System</p>
-            <br>
-            <a href="/admin/dashboard">📊 Dashboard</a>
-            <a href="/docs">📚 API Docs</a>
-            <a href="/health">💚 Health Check</a>
-        </body>
-    </html>
-    """
+    return {
+        "service": "Sovereign Empire API",
+        "status": "online",
+        "version": "1.0.0",
+        "orders_count": len(orders_db)
+    }
 
-
+# Health check
 @app.get("/health")
 async def health_check():
-    """Health check endpoint"""
-    return {"status": "healthy", "timestamp": datetime.utcnow().isoformat()}
+    return {
+        "status": "healthy",
+        "timestamp": datetime.now().isoformat(),
+        "service": "Sovereign Empire Order API",
+        "orders": len(orders_db)
+    }
 
-
-@app.post("/api/orders/create", response_model=OrderResponse)
-async def create_order(order: OrderCreate, db: Session = Depends(get_db)):
-    """Create a new order"""
+# Create new order
+@app.post("/api/orders/create")
+async def create_order(order: OrderCreate):
     try:
-        # Generate unique order ID
-        order_id = f"ORD_{uuid.uuid4().hex[:12].upper()}"
-        
-        # Create order object
-        new_order = Order(
-            order_id=order_id,
-            customer_name=order.customer_name,
-            customer_email=order.customer_email,
-            industry=order.industry,
-            topic=order.topic,
-            wordpress_url=order.wordpress_url,
-            tenant_id=order.tenant_id,
-            status="PENDING",
-            cost=0.0,
-            created_at=datetime.utcnow()
-        )
-        
-        # Save to database
-        db.add(new_order)
-        db.commit()
-        db.refresh(new_order)
-        
+        order_id = f"ORD-{len(orders_db) + 1:04d}"
+        new_order = {
+            "order_id": order_id,
+            "customer_name": order.customer_name,
+            "customer_email": order.customer_email,
+            "industry": order.industry,
+            "topic": order.topic,
+            "wordpress_url": order.wordpress_url,
+            "tenant_id": order.tenant_id,
+            "status": "pending",
+            "created_at": datetime.now().isoformat()
+        }
+        orders_db.append(new_order)
         return new_order
-        
     except Exception as e:
-        db.rollback()
-        raise HTTPException(status_code=500, detail=f"Failed to create order: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error creating order: {str(e)}")
 
+# List all orders
+@app.get("/api/orders")
+async def list_orders():
+    return orders_db
 
-@app.get("/api/orders", response_model=List[OrderResponse])
-async def list_orders(db: Session = Depends(get_db)):
-    """List all orders"""
-    orders = db.query(Order).order_by(Order.created_at.desc()).all()
-    return orders
+# Get specific order
+@app.get("/api/orders/{order_id}")
+async def get_order(order_id: str):
+    for order in orders_db:
+        if order["order_id"] == order_id:
+            return order
+    raise HTTPException(status_code=404, detail="Order not found")
 
+# Update order status
+@app.put("/api/orders/{order_id}")
+async def update_order(order_id: str, update: OrderUpdate):
+    for order in orders_db:
+        if order["order_id"] == order_id:
+            if update.status:
+                order["status"] = update.status
+            return order
+    raise HTTPException(status_code=404, detail="Order not found")
 
-@app.get("/api/orders/{order_id}", response_model=OrderResponse)
-async def get_order(order_id: str, db: Session = Depends(get_db)):
-    """Get specific order"""
-    order = db.query(Order).filter(Order.order_id == order_id).first()
-    if not order:
-        raise HTTPException(status_code=404, detail="Order not found")
-    return order
-
-
-@app.put("/api/orders/{order_id}/status")
-async def update_order_status(order_id: str, status: str, db: Session = Depends(get_db)):
-    """Update order status"""
-    order = db.query(Order).filter(Order.order_id == order_id).first()
-    if not order:
-        raise HTTPException(status_code=404, detail="Order not found")
-    
-    order.status = status
-    db.commit()
-    
-    return {"message": "Status updated", "order_id": order_id, "new_status": status}
-
-
+# Delete order
 @app.delete("/api/orders/{order_id}")
-async def delete_order(order_id: str, db: Session = Depends(get_db)):
-    """Delete an order"""
-    order = db.query(Order).filter(Order.order_id == order_id).first()
-    if not order:
+async def delete_order(order_id: str):
+    global orders_db
+    original_length = len(orders_db)
+    orders_db = [order for order in orders_db if order["order_id"] != order_id]
+    
+    if len(orders_db) == original_length:
         raise HTTPException(status_code=404, detail="Order not found")
     
-    db.delete(order)
-    db.commit()
-    
-    return {"message": "Order deleted", "order_id": order_id}
+    return {"message": "Order deleted successfully"}
 
-
-# ============================================================================
-# ADMIN DASHBOARD
-# ============================================================================
-
-@app.get("/admin/dashboard", response_class=HTMLResponse)
-async def admin_dashboard(db: Session = Depends(get_db)):
-    """Admin dashboard to view and manage orders"""
+# ADMIN DASHBOARD - THIS IS WHAT YOU NEED!
+@app.get("/admin/dashboard")
+async def admin_dashboard():
+    # Count orders by status
+    status_counts = {}
+    for order in orders_db:
+        status = order.get("status", "unknown")
+        status_counts[status] = status_counts.get(status, 0) + 1
     
-    # Get orders
-    orders = db.query(Order).order_by(Order.created_at.desc()).all()
-    
-    # Count by status
-    total = len(orders)
-    pending = len([o for o in orders if o.status == "PENDING"])
-    completed = len([o for o in orders if o.status == "COMPLETED"])
-    failed = len([o for o in orders if o.status == "FAILED"])
-    
-    # Generate order rows HTML
-    order_rows = ""
-    for order in orders:
-        status_color = {
-            "PENDING": "#ffc107",
-            "COMPLETED": "#28a745",
-            "FAILED": "#dc3545"
-        }.get(order.status, "#6c757d")
-        
-        order_rows += f"""
-        <tr>
-            <td>{order.order_id}</td>
-            <td>{order.customer_email}</td>
-            <td>{order.topic}</td>
-            <td><span style="background: {status_color}; color: white; padding: 5px 10px; border-radius: 4px; font-size: 12px; font-weight: bold;">{order.status}</span></td>
-            <td>{order.created_at.strftime('%m/%d/%Y, %I:%M:%S %p')}</td>
-            <td>${order.cost:.3f}</td>
-            <td>
-                <button onclick="viewOrder('{order.order_id}')" style="background: #667eea; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: 600;">View</button>
-            </td>
-        </tr>
-        """
-    
-    html = f"""
+    # Generate HTML dashboard
+    html_content = f"""
     <!DOCTYPE html>
-    <html>
+    <html lang="en">
     <head>
-        <title>Sovereign Empire - Admin Dashboard</title>
+        <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Orders Dashboard - Sovereign Empire</title>
         <style>
-            * {{ margin: 0; padding: 0; box-sizing: border-box; }}
-            body {{ 
+            body {{
                 font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                background: #0f1419;
-                color: #e1e8ed;
+                margin: 0;
                 padding: 20px;
+                background: #f5f5f5;
+                color: #333;
             }}
-            .header {{
+            .container {{
+                max-width: 1200px;
+                margin: 0 auto;
+            }}
+            header {{
                 background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                padding: 40px;
-                border-radius: 12px;
+                color: white;
+                padding: 30px;
+                border-radius: 10px;
                 margin-bottom: 30px;
-                text-align: center;
             }}
-            .header h1 {{ font-size: 36px; margin-bottom: 10px; }}
-            .header p {{ font-size: 16px; opacity: 0.9; }}
+            h1 {{
+                margin: 0;
+                font-size: 2.5em;
+            }}
             .stats {{
                 display: grid;
                 grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -296,123 +226,188 @@ async def admin_dashboard(db: Session = Depends(get_db)):
                 margin-bottom: 30px;
             }}
             .stat-card {{
-                background: #192734;
-                padding: 25px;
-                border-radius: 12px;
-                border: 1px solid #38444d;
+                background: white;
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                text-align: center;
             }}
-            .stat-card h3 {{ color: #8899a6; font-size: 14px; margin-bottom: 10px; }}
-            .stat-card .number {{ font-size: 32px; font-weight: bold; color: #fff; }}
-            .controls {{
-                margin-bottom: 20px;
-                display: flex;
-                gap: 10px;
-                flex-wrap: wrap;
+            .stat-number {{
+                font-size: 2.5em;
+                font-weight: bold;
+                color: #667eea;
+                margin: 10px 0;
             }}
-            .btn {{
-                padding: 10px 20px;
-                border: none;
-                border-radius: 6px;
-                cursor: pointer;
-                font-weight: 600;
-                font-size: 14px;
-            }}
-            .btn-primary {{ background: #667eea; color: white; }}
-            .btn-secondary {{ background: #38444d; color: white; }}
-            .table-container {{
-                background: #192734;
-                border-radius: 12px;
+            .orders-table {{
+                background: white;
+                border-radius: 8px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
                 overflow: hidden;
-                border: 1px solid #38444d;
             }}
             table {{
                 width: 100%;
                 border-collapse: collapse;
             }}
             th {{
-                background: #1c2938;
+                background: #f8f9fa;
                 padding: 15px;
                 text-align: left;
                 font-weight: 600;
-                color: #8899a6;
-                font-size: 12px;
-                text-transform: uppercase;
+                color: #495057;
+                border-bottom: 2px solid #e9ecef;
             }}
             td {{
                 padding: 15px;
-                border-top: 1px solid #38444d;
+                border-bottom: 1px solid #e9ecef;
             }}
             tr:hover {{
-                background: #1c2938;
+                background: #f8f9fa;
             }}
+            .status-badge {{
+                padding: 5px 15px;
+                border-radius: 20px;
+                font-size: 0.85em;
+                font-weight: 600;
+            }}
+            .status-pending {{ background: #fff3cd; color: #856404; }}
+            .status-in_progress {{ background: #cce5ff; color: #004085; }}
+            .status-completed {{ background: #d4edda; color: #155724; }}
+            .actions {{
+                display: flex;
+                gap: 10px;
+            }}
+            .btn {{
+                padding: 5px 15px;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                font-weight: 500;
+            }}
+            .btn-view {{ background: #6c757d; color: white; }}
+            .btn-edit {{ background: #007bff; color: white; }}
+            .btn-delete {{ background: #dc3545; color: white; }}
         </style>
     </head>
     <body>
-        <div class="header">
-            <h1>🏛️ Sovereign Empire - Ops Console</h1>
-            <p>Content Generation Management Dashboard</p>
-        </div>
-        
-        <div class="stats">
-            <div class="stat-card">
-                <h3>Total Orders</h3>
-                <div class="number">{total}</div>
+        <div class="container">
+            <header>
+                <h1>📊 Orders Dashboard</h1>
+                <p>Manage all customer orders in one place</p>
+            </header>
+            
+            <div class="stats">
+                <div class="stat-card">
+                    <div>Total Orders</div>
+                    <div class="stat-number">{len(orders_db)}</div>
+                </div>
+                <div class="stat-card">
+                    <div>Pending</div>
+                    <div class="stat-number">{status_counts.get('pending', 0)}</div>
+                </div>
+                <div class="stat-card">
+                    <div>In Progress</div>
+                    <div class="stat-number">{status_counts.get('in_progress', 0)}</div>
+                </div>
+                <div class="stat-card">
+                    <div>Completed</div>
+                    <div class="stat-number">{status_counts.get('completed', 0)}</div>
+                </div>
             </div>
-            <div class="stat-card">
-                <h3>Pending Approval</h3>
-                <div class="number">{pending}</div>
+            
+            <div class="orders-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Email</th>
+                            <th>Industry</th>
+                            <th>Topic</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+    """
+    
+    # Add each order as a table row
+    for order in orders_db:
+        status_class = f"status-{order['status']}"
+        html_content += f"""
+                        <tr>
+                            <td><strong>{order['order_id']}</strong></td>
+                            <td>{order['customer_name']}</td>
+                            <td>{order['customer_email']}</td>
+                            <td>{order['industry']}</td>
+                            <td>{order['topic']}</td>
+                            <td><span class="status-badge {status_class}">{order['status']}</span></td>
+                            <td>{order['created_at'][:10]}</td>
+                            <td class="actions">
+                                <button class="btn btn-view" onclick="viewOrder('{order['order_id']}')">View</button>
+                                <button class="btn btn-edit" onclick="editOrder('{order['order_id']}')">Edit</button>
+                                <button class="btn btn-delete" onclick="deleteOrder('{order['order_id']}')">Delete</button>
+                            </td>
+                        </tr>
+        """
+    
+    # Add JavaScript functions
+    html_content += """
+                    </tbody>
+                </table>
             </div>
-            <div class="stat-card">
-                <h3>Failed</h3>
-                <div class="number">{failed}</div>
-            </div>
-            <div class="stat-card">
-                <h3>Completed</h3>
-                <div class="number">{completed}</div>
-            </div>
-        </div>
-        
-        <div class="controls">
-            <button class="btn btn-primary" onclick="location.reload()">🔄 Refresh</button>
-            <button class="btn btn-secondary" onclick="window.location.href='/docs'">📚 API Docs</button>
-        </div>
-        
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>ORDER ID</th>
-                        <th>CUSTOMER</th>
-                        <th>TOPIC</th>
-                        <th>STATUS</th>
-                        <th>CREATED</th>
-                        <th>COST</th>
-                        <th>ACTIONS</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {order_rows if order_rows else '<tr><td colspan="7" style="text-align: center; padding: 40px; color: #8899a6;">No orders yet</td></tr>'}
-                </tbody>
-            </table>
         </div>
         
         <script>
-            function viewOrder(orderId) {{
-                window.location.href = `/api/orders/${{orderId}}`;
-            }}
+            function viewOrder(orderId) {
+                alert('View order: ' + orderId);
+                // In production: window.location.href = `/api/orders/${orderId}`;
+            }
+            
+            function editOrder(orderId) {
+                const newStatus = prompt('Enter new status (pending/in_progress/completed):', 'pending');
+                if (newStatus) {
+                    fetch(`/api/orders/${orderId}`, {
+                        method: 'PUT',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({status: newStatus})
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert('Order updated successfully!');
+                        location.reload();
+                    })
+                    .catch(error => {
+                        alert('Error updating order: ' + error);
+                    });
+                }
+            }
+            
+            function deleteOrder(orderId) {
+                if (confirm('Are you sure you want to delete order ' + orderId + '?')) {
+                    fetch(`/api/orders/${orderId}`, {
+                        method: 'DELETE'
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert('Order deleted successfully!');
+                        location.reload();
+                    })
+                    .catch(error => {
+                        alert('Error deleting order: ' + error);
+                    });
+                }
+            }
         </script>
     </body>
     </html>
     """
     
-    return html
+    return HTMLResponse(content=html_content)
 
-
-# ============================================================================
-# STARTUP
-# ============================================================================
+# Swagger/OpenAPI docs at /docs
+# Already provided by FastAPI
 
 if __name__ == "__main__":
     import uvicorn
-    port = int(os.getenv("PORT", 8000))
-    uvicorn.run(app, host="0.0.0.0", port=port)
+    uvicorn.run(app, host="0.0.0.0", port=8000)
