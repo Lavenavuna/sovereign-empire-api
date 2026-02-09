@@ -1,228 +1,178 @@
-html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>30-Day Google Visibility Kickstart | Local Business SEO</title>
+    <title>Sovereign Empire - Control Panel</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
-            line-height: 1.6; 
-            color: #333;
-        }
-        .hero { 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-            color: white; 
-            padding: 80px 20px; 
-            text-align: center; 
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-        .hero h1 { 
-            font-size: 48px; 
-            margin-bottom: 20px; 
-            line-height: 1.2; 
-        }
-        .hero h2 { 
-            font-size: 24px; 
-            margin-bottom: 30px; 
-            font-weight: 400; 
-            opacity: 0.95; 
-        }
-        .hero p { 
-            font-size: 20px; 
-            max-width: 700px; 
-            margin: 0 auto 50px; 
-            line-height: 1.8;
-        }
-        .cta-buttons {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        .cta-button { 
-            display: inline-block; 
-            background: #fff; 
-            color: #667eea; 
-            padding: 20px 40px; 
-            font-size: 20px; 
-            font-weight: 600; 
-            text-decoration: none; 
-            border-radius: 8px; 
-            transition: transform 0.2s; 
-        }
-        .cta-button:hover { 
-            transform: translateY(-2px); 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3); 
-        }
-        .cta-button.secondary {
-            background: transparent;
+        body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+        
+        /* Navigation */
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            border: 2px solid white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        .container { 
-            max-width: 1200px; 
-            margin: 0 auto; 
-            padding: 60px 20px; 
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            margin-left: 25px;
+            font-weight: 500;
         }
-        .section { 
-            margin-bottom: 60px; 
+        
+        /* Container */
+        .container {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 100vh;
         }
-        .section h2 { 
-            font-size: 36px; 
-            margin-bottom: 30px; 
-            text-align: center; 
-            color: #333; 
+        
+        /* Sidebar */
+        .sidebar {
+            background: #f8f9fa;
+            padding: 30px 20px;
+            border-right: 1px solid #dee2e6;
         }
-        .benefits { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
-            gap: 30px; 
-            margin-top: 40px; 
-        }
-        .benefit { 
-            background: #f8f9fa; 
-            padding: 30px; 
-            border-radius: 8px; 
-        }
-        .benefit h3 { 
-            color: #667eea; 
-            margin-bottom: 15px; 
-            font-size: 22px; 
-        }
-        .pricing { 
-            background: #f8f9fa; 
-            padding: 60px 20px; 
-            text-align: center; 
-        }
-        .price { 
-            font-size: 64px; 
-            font-weight: bold; 
-            color: #667eea; 
-            margin: 20px 0; 
-        }
-        .price-note { 
-            font-size: 18px; 
-            color: #666; 
-            margin-bottom: 30px; 
-        }
-        .contact-box {
+        .sidebar a {
+            display: block;
+            padding: 12px 15px;
+            margin: 8px 0;
             background: white;
-            padding: 40px;
-            border-radius: 12px;
-            max-width: 600px;
-            margin: 0 auto;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #333;
+            border-left: 4px solid transparent;
+        }
+        .sidebar a:hover {
+            border-left-color: #667eea;
+            background: #f0f2ff;
+        }
+        .sidebar a.active {
+            border-left-color: #667eea;
+            background: #f0f2ff;
+            font-weight: 600;
+        }
+        
+        /* Content Area */
+        .content {
+            padding: 30px;
+        }
+        
+        /* Iframe for embeds */
+        .iframe-container {
+            width: 100%;
+            height: calc(100vh - 100px);
+            border: none;
+            border-radius: 8px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        }
-        .contact-box h3 {
-            color: #667eea;
-            margin-bottom: 20px;
-            font-size: 24px;
-        }
-        .contact-box p {
-            font-size: 18px;
-            margin-bottom: 30px;
-            line-height: 1.8;
         }
     </style>
 </head>
 <body>
-
-<section class="hero">
-    <div>
-        <h1>Turn Your Website Into a Lead Source,<br>Not Just an Online Brochure</h1>
-        <h2>30-Day Google Visibility Kickstart for Local Businesses</h2>
-        <p>We help Google clearly understand what you do, where you operate, and who you're for—so your site attracts local customers actively searching for your services.</p>
-        
-        <div class="cta-buttons">
-            <a href="mailto:sretonia@gmail.com?subject=30-Day Google Visibility Kickstart - Order Request&body=Hi, I'd like to order the 30-Day Google Visibility Kickstart for $149.%0A%0AMy details:%0A%0ABusiness Name: %0AEmail: %0ABusiness Type: %0AService I want to rank for: %0AWebsite (if any): %0A%0APlease send me PayPal payment instructions.%0A%0AThank you!" class="cta-button">
-                📧 Email to Order - $149
-            </a>
-            <a href="#details" class="cta-button secondary">Learn More ↓</a>
+    <!-- Navigation -->
+    <div class="navbar">
+        <h2 style="margin: 0;">🚀 Sovereign Empire Control Panel</h2>
+        <div class="nav-links">
+            <a href="/" target="_blank">🌐 Public Website</a>
+            <a href="mailto:sretonia@gmail.com">📧 Support</a>
         </div>
     </div>
-</section>
-
-<div class="container" id="details">
-    <section class="section">
-        <h2>What You Get in 30 Days</h2>
-        <div class="benefits">
-            <div class="benefit">
-                <h3>🎯 3 SEO-Optimized Blog Posts</h3>
-                <p>Targeted to YOUR service + YOUR location. Written to rank, not just "sound nice". Answers the questions your customers actually search for.</p>
-            </div>
-            <div class="benefit">
-                <h3>📄 1 Service Page Rewrite</h3>
-                <p>Clear, conversion-focused copy structured for local search intent. Turns visitors into leads with strong calls-to-action.</p>
-            </div>
-            <div class="benefit">
-                <h3>📍 Google Business Profile Content</h3>
-                <p>1 optimized GMB post keyword-aligned with your service and location. Helps you show up in local map searches.</p>
-            </div>
-            <div class="benefit">
-                <h3>🔑 Keyword & Intent Targeting</h3>
-                <p>Primary keyword research with supporting long-tail keywords and local modifiers baked in. We find what your customers are actually searching.</p>
-            </div>
-            <div class="benefit">
-                <h3>✅ Human Review & Optimization</h3>
-                <p>No raw AI content. Everything is reviewed, fact-checked, and optimized by a real person. Readable, credible, and publish-ready.</p>
-            </div>
-            <div class="benefit">
-                <h3>📈 Clear Next Steps</h3>
-                <p>We don't just deliver content and disappear. You get clear instructions on what to do next to maximize your Google visibility.</p>
-            </div>
-        </div>
-    </section>
-</div>
-
-<section class="pricing">
-    <h2>Simple, Transparent Pricing</h2>
-    <div class="price">$149</div>
-    <p class="price-note">One-time payment. 30-day delivery. No hidden fees.</p>
-    <a href="mailto:sretonia@gmail.com?subject=30-Day Google Visibility Kickstart - Order Request&body=Hi, I'd like to order the 30-Day Google Visibility Kickstart for $149.%0A%0AMy details:%0A%0ABusiness Name: %0AEmail: %0ABusiness Type: %0AService I want to rank for: %0AWebsite (if any): %0A%0APlease send me PayPal payment instructions.%0A%0AThank you!" class="cta-button">
-        📧 Email to Order Now
-    </a>
-</section>
-
-<div class="container">
-    <section class="section">
-        <div class="contact-box">
-            <h3>Who This Is For</h3>
-            <p><strong>Local service businesses</strong> who depend on customers finding them via Google.</p>
-            <p>Perfect for: Cleaning services, trades (plumbing, electrical, HVAC), dental practices, salons, car detailing, home services, professional services, medical practices, law firms, accounting firms.</p>
-            <p><strong>This is NOT for:</strong> E-commerce stores, national brands, or businesses without a local service area.</p>
-        </div>
-    </section>
     
-    <section class="section">
-        <div class="contact-box">
-            <h3>What We Promise (and Don't)</h3>
-            <p><strong>❌ We do NOT promise:</strong> Guaranteed rankings or guaranteed leads. No one can promise that honestly.</p>
-            <p><strong>✅ We DO promise:</strong> We help Google clearly understand what you do, where you operate, and who you're for—so your site and Google Business Profile are positioned to attract local search traffic.</p>
-            <p>We give you the foundation. Google does the rest.</p>
-        </div>
-    </section>
-    
-    <section class="section">
-        <div class="contact-box">
-            <h3>Ready to Get Started?</h3>
-            <p><strong>Step 1:</strong> Click the email button above (it opens your email app with a pre-filled template)</p>
-            <p><strong>Step 2:</strong> Fill in your business details</p>
-            <p><strong>Step 3:</strong> Send the email</p>
-            <p><strong>Step 4:</strong> We'll reply within 24 hours with PayPal payment instructions</p>
-            <p><strong>Step 5:</strong> After payment, we start your 30-Day Google Visibility Kickstart</p>
-            <br>
-            <a href="mailto:sretonia@gmail.com?subject=30-Day Google Visibility Kickstart - Order Request&body=Hi, I'd like to order the 30-Day Google Visibility Kickstart for $149.%0A%0AMy details:%0A%0ABusiness Name: %0AEmail: %0ABusiness Type: %0AService I want to rank for: %0AWebsite (if any): %0A%0APlease send me PayPal payment instructions.%0A%0AThank you!" class="cta-button">
-                📧 Email: sretonia@gmail.com
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <h3 style="margin-top: 0;">📋 Menu</h3>
+            <a href="#" onclick="loadDashboard()" class="active">📊 Order Dashboard</a>
+            <a href="#" onclick="loadAPIDocs()">📚 API Documentation</a>
+            <a href="#" onclick="loadLandingPage()">🛒 Landing Page Preview</a>
+            <a href="#" onclick="loadAnalytics()">📈 Revenue Analytics</a>
+            
+            <hr style="margin: 30px 0;">
+            
+            <h3>⚙️ Quick Actions</h3>
+            <a href="https://sovereign-empire-api-production.up.railway.app/api/orders" target="_blank">
+                📋 View All Orders (JSON)
+            </a>
+            <a href="https://railway.app" target="_blank">
+                🚂 Railway Server
+            </a>
+            <a href="https://github.com/Lavenavuna/sovereign-empire-api" target="_blank">
+                💾 GitHub Code
             </a>
         </div>
-    </section>
-</div>
-
+        
+        <!-- Content -->
+        <div class="content">
+            <iframe 
+                id="contentFrame" 
+                class="iframe-container" 
+                src="https://sovereign-empire-api-production.up.railway.app/admin/dashboard">
+            </iframe>
+        </div>
+    </div>
+    
+    <script>
+        function loadDashboard() {
+            document.getElementById('contentFrame').src = 
+                'https://sovereign-empire-api-production.up.railway.app/admin/dashboard';
+            updateActiveTab('dashboard');
+        }
+        
+        function loadAPIDocs() {
+            document.getElementById('contentFrame').src = 
+                'https://sovereign-empire-api-production.up.railway.app/docs';
+            updateActiveTab('docs');
+        }
+        
+        function loadLandingPage() {
+            document.getElementById('contentFrame').src = 
+                'https://lavenavuna.github.io/sovereign-empire-api/';
+            updateActiveTab('landing');
+        }
+        
+        function loadAnalytics() {
+            // Simple revenue dashboard
+            const html = `
+                <div style="padding: 30px;">
+                    <h1>📈 Revenue Analytics</h1>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin: 30px 0;">
+                        <div style="background: white; padding: 25px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                            <h3 style="margin-top: 0;">Total Revenue</h3>
+                            <div style="font-size: 48px; font-weight: bold; color: #10b981;">$894</div>
+                            <div style="color: #6b7280;">6 orders × $149</div>
+                        </div>
+                        <div style="background: white; padding: 25px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                            <h3 style="margin-top: 0;">Paid Orders</h3>
+                            <div style="font-size: 48px; font-weight: bold; color: #3b82f6;">6</div>
+                            <div style="color: #6b7280;">100% payment rate</div>
+                        </div>
+                        <div style="background: white; padding: 25px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,2px,10px rgba(0,0,0,0.1);">
+                            <h3 style="margin-top: 0;">Average Order</h3>
+                            <div style="font-size: 48px; font-weight: bold; color: #8b5cf6;">$149</div>
+                            <div style="color: #6b7280;">Standard pricing</div>
+                        </div>
+                    </div>
+                    <h2>📊 Order Value Breakdown</h2>
+                    <div id="chart" style="height: 400px; margin-top: 20px;"></div>
+                </div>
+            `;
+            
+            // Open in new tab or embed
+            const newWindow = window.open();
+            newWindow.document.write(html);
+            newWindow.document.close();
+        }
+        
+        function updateActiveTab(tabName) {
+            document.querySelectorAll('.sidebar a').forEach(link => {
+                link.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+    </script>
 </body>
 </html>
