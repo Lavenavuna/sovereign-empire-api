@@ -13,18 +13,17 @@ venv.bak/
 # Environment
 .env
 .env.local
-.env.development.local
-.env.test.local
-.env.production.local
 
-# Orders (generated content)
+# Generated content
 generated_orders/
 premium_delivery_*/
 orders/
+output/
 
 # API keys
+*.key
+*.pem
 secrets.txt
-api_keys.txt
 
 # IDE
 .vscode/
