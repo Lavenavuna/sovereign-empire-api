@@ -1,37 +1,51 @@
 import requests
 import json
 
-# Test if API is alive
-print("Testing API connection...")
-try:
-    response = requests.get("https://sovereign-empire-api-production.up.railway.app/", timeout=10)
-    print(f"✅ API Status: {response.status_code}")
-    print(f"Response: {response.text}")
-except Exception as e:
-    print(f"❌ API Error: {e}")
-    exit()
+def test_simple():
+    print("Testing Sovereign Empire API...")
+    
+    # Test 1: Root endpoint
+    print("\n1. Testing root endpoint...")
+    try:
+        r = requests.get("https://sovereign-empire-api-production.up.railway.app/", timeout=5)
+        print(f"   Status: {r.status_code}")
+        print(f"   Response: {r.text}")
+    except Exception as e:
+        print(f"   ❌ Failed: {e}")
+        return
+    
+    # Test 2: Create order
+    print("\n2. Testing order creation...")
+    
+    order_data = {
+        "business_type": "Plumbing",
+        "service_area": "Austin TX",
+        "package_tier": "dominance",
+        "customer_email": "test@example.com",
+        "customer_name": "Test Client",
+        "order_total": 497.00
+    }
+    
+    try:
+        r = requests.post(
+            "https://sovereign-empire-api-production.up.railway.app/api/orders/create",
+            json=order_data,
+            timeout=10
+        )
+        
+        print(f"   Status: {r.status_code}")
+        print(f"   Response: {r.text}")
+        
+        if r.status_code == 200:
+            print("\n✅ SUCCESS! API is working!")
+            data = r.json()
+            print(f"   Order ID: {data.get('order_id')}")
+            print(f"   Status: {data.get('status')}")
+        else:
+            print(f"\n❌ Failed with status {r.status_code}")
+            
+    except Exception as e:
+        print(f"   ❌ Request failed: {e}")
 
-# Test order creation
-print("\n\nCreating order...")
-url = "https://sovereign-empire-api-production.up.railway.app/api/orders/create"
-
-payload = {
-    "business_type": "Plumbing",
-    "service_area": "Austin, TX",
-    "package_tier": "dominance",
-    "customer_email": "test@example.com",
-    "customer_name": "Test Client",
-    "order_total": 497.00
-}
-
-headers = {
-    "Content-Type": "application/json",
-    "accept": "application/json"
-}
-
-try:
-    response = requests.post(url, json=payload, headers=headers, timeout=30)
-    print(f"Status Code: {response.status_code}")
-    print(f"Response: {json.dumps(response.json(), indent=2) if response.text else 'Empty response'}")
-except Exception as e:
-    print(f"Error: {e}")
+if __name__ == "__main__":
+    test_simple()
